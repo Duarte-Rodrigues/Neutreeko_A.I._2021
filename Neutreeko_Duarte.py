@@ -62,4 +62,3 @@ print(b)
 
 #Heuristica
 
-pieces
