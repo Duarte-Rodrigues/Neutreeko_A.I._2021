@@ -2,6 +2,18 @@ from game2dboard import Board
 import numpy as np
 
 
+board_size=5
+
+b=np.zeros((board_size,board_size))
+
+def init(b):
+    b[0,1]=1
+    b[0,3]=1
+    b[1,2]=2
+    b[4,1]=2
+    b[4,3]=2
+    b[3,2]=1
+
 
 #Checks legal moves
 def legal(board, size, coord, direction):
@@ -84,19 +96,19 @@ def move_piece(board, init_coord, final_coord ):
 
 
 def start_game(size):
-    global b 
-    b = Board(size, size)       
-    b[0][1] = 1
-    b[0][3] = 1
-    b[3][2] = 1
-    b[1][2] = 2
-    b[4][1] = 2
-    b[4][3] = 2
-    b.title = "Neutreeko"
-    b.cell_size = 120       
-    b.cell_color = "LightGreen"
-    b.margin = 25
-    b._margin_color = "MediumSeaGreen"
+    global bo 
+    bo = Board(size, size)       
+    bo[0][1] = 1
+    bo[0][3] = 1
+    bo[3][2] = 1
+    bo[1][2] = 2
+    bo[4][1] = 2
+    bo[4][3] = 2
+    bo.title = "Neutreeko"
+    bo.cell_size = 120       
+    bo.cell_color = "LightGreen"
+    bo.margin = 25
+    bo._margin_color = "MediumSeaGreen"
 
 
 start_game(5)
@@ -105,14 +117,15 @@ start_game(5)
 def select_piece(btn,row,col):
     for dir in range(1,9):
         legal_coord = legal(b,5,[row,col],dir) #resolver a questão do size
-        b[row][col] = 3
+        bo[row][col] = 3
 
-b.on_mouse_click = select_piece
+bo.on_mouse_click = select_piece
 
-#def select_move(btn,row, col):
-#   move_piece(b, init_coord,[row,col] )
+def select_move(btn,row, col):
+    move_piece(b, init_coord,[row,col] )
+    bo[row][col] = 1 #ou 2
+    bo[init_coord[0]][init_coord[1]]= 0 
 
 
 
-
-b.show()
+bo.show()
