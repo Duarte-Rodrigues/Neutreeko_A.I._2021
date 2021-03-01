@@ -3,31 +3,76 @@ import numpy as np
 
 
 
-def legal(board, coord, direction):
-    init_coord = np.array(coord)
+#Checks legal moves
+def legal(board, size, coord, direction):
+    init_coord = np.asarray(coord)
     empty = True
-    new_pos= np.array(coord)
+    new_pos= np.asarray(coord)
     
     if direction == 1: #UP
         while empty == True:
             if new_pos[0]!=0 and board[new_pos[0]-1,new_pos[1]] == 0:
                 new_pos[0] = new_pos[0]-1 #não é preciso mudar a coluna
             else:
-                empty = False         
+                empty = False   
+    elif direction == 2: #Down
+        
+        while empty == True:
+            if new_pos[0]!= size-1 and board[new_pos[0]+1,new_pos[1]] == 0:
+                    new_pos[0] = new_pos[0]+1
+            else:
+                empty = False   
+    elif direction == 3: #Right
+        
+        while empty == True:
+            if new_pos[1]!= size-1 and board[new_pos[0],new_pos[1]+1] == 0:
+                    new_pos[1] = new_pos[1]+1
+            else:
+                empty = False
+    elif direction == 4: #Left
+        while empty == True:
+            if new_pos[1]!=0 and board[new_pos[0],new_pos[1]-1] == 0:
+                new_pos[1] = new_pos[1]-1 #não é preciso mudar a coluna
+            else:
+                empty = False     
     elif direction == 5: #Up right
         
         while empty == True:
-            if new_pos[0]!= 0 and new_pos[1]!= size-1:
-                if  board[new_pos[0]-1,new_pos[1]+1] == 0:
+            if (new_pos[0]!= 0 and new_pos[1]!= size-1) and board[new_pos[0]-1,new_pos[1]+1] == 0:
                     new_pos[0] = new_pos[0]-1
                     new_pos[1] = new_pos[1]+1
             else:
                 empty = False
-                
+    elif direction == 6: #Up left
+        
+        while empty == True:
+            if (new_pos[0]!= 0 and new_pos[1]!= 0) and board[new_pos[0]-1,new_pos[1]-1] == 0:
+                    new_pos[0] = new_pos[0]-1
+                    new_pos[1] = new_pos[1]-1
+            else:
+                empty = False
+    elif direction == 7: #Down right
+        
+        while empty == True:
+            if (new_pos[0]!= size-1 and new_pos[1]!= size-1) and board[new_pos[0]+1,new_pos[1]+1] == 0:
+                    new_pos[0] = new_pos[0]+1
+                    new_pos[1] = new_pos[1]+1
+            else:
+                empty = False
+    elif direction == 8: #Down left
+        
+        while empty == True:
+            if (new_pos[0]!= size-1 and new_pos[1]!= 0) and board[new_pos[0]+1,new_pos[1]-1] == 0:
+                    new_pos[0] = new_pos[0]+1
+                    new_pos[1] = new_pos[1]-1
+            else:
+                empty = False
+         
         
         
     if np.array_equal(new_pos,init_coord):
         print("Move not possible")
+        return False
     else:
         return new_pos
 
@@ -59,7 +104,7 @@ start_game(5)
 
 def select_piece(btn,row,col):
     for dir in range(1,9):
-        legal_coord = legal(b,[row,col],dir)
+        legal_coord = legal(b,5,[row,col],dir) #resolver a questão do size
         b[row][col] = 3
 
 b.on_mouse_click = select_piece
