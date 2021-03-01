@@ -5,9 +5,9 @@ import numpy as np
 
 #Checks legal moves
 def legal(board, size, coord, direction):
-    init_coord = np.asarray(coord)
+    init_coord = np.array(coord)
     empty = True
-    new_pos= np.asarray(coord)
+    new_pos= np.array(coord)
     
     if direction == 1: #UP
         while empty == True:
