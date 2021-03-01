@@ -14,6 +14,8 @@ def init(b):
     b[4,3]=2
     b[3,2]=1
 
+init(b)
+selected = False
 
 #Checks legal moves
 def legal(board, size, coord, direction):
@@ -83,7 +85,6 @@ def legal(board, size, coord, direction):
         
         
     if np.array_equal(new_pos,init_coord):
-        print("Move not possible")
         return False
     else:
         return new_pos
@@ -109,22 +110,65 @@ def start_game(size):
     bo.cell_color = "LightGreen"
     bo.margin = 25
     bo._margin_color = "MediumSeaGreen"
+    bo.create_output(background_color="MediumSeaGreen", color="black", font_size=12)
 
 
-start_game(5)
 
 
-def select_piece(btn,row,col):
-    for dir in range(1,9):
-        legal_coord = legal(b,5,[row,col],dir) #resolver a questão do size
-        bo[row][col] = 3
+start_game(board_size)
 
-bo.on_mouse_click = select_piece
 
-def select_move(btn,row, col):
-    move_piece(b, init_coord,[row,col] )
-    bo[row][col] = 1 #ou 2
-    bo[init_coord[0]][init_coord[1]]= 0 
+
+def move(btn,row,col):
+    global moved
+    if moved==False:
+        global selected
+        if b[row,col]== play_color:
+            
+            for i in range(board_size):
+                for j in range(board_size):
+                    if b[i,j]==0:
+                        bo[i][j] =0
+                    #else:               
+                        #bo[i][j] =b[i,j]
+        
+            for dir in range(1,9):
+                legal_coord = legal(b,5,[row,col],dir) #resolver a questão do size
+                if isinstance(legal_coord, np.ndarray):
+                    bo[legal_coord[0]][legal_coord[1]]=3
+                
+                
+            selected=True
+            global selected_piece
+            selected_piece=[row,col] 
+
+        elif  b[row,col]== 0 and selected==True:
+            move_piece(b,selected_piece,[row,col] )
+            bo[row][col] = play_color
+            bo[selected_piece[0]][selected_piece[1]]=0 
+            moved=True
+            for i in range(board_size):
+                for j in range(board_size):
+                    if b[i,j]==0:
+                        bo[i][j] =0
+
+        
+
+
+
+
+
+def player_turn():
+    selected=False
+    bo.print("Your turn, player",play_color)
+    global moved
+    moved=False
+    bo.on_mouse_click = move
+
+
+play_color=1
+
+player_turn()
 
 
 
