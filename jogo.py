@@ -17,6 +17,7 @@ def init(b):
 init(b)
 selected = False
 
+
 #Checks legal moves
 def legal(board, size, coord, direction):
     init_coord = np.array(coord)
@@ -94,8 +95,6 @@ def move_piece(board, init_coord, final_coord ):
     board[init_coord[0],init_coord[1]]=0
 
 
-
-
 def start_game(size):
     global bo 
     bo = Board(size, size)       
@@ -114,43 +113,51 @@ def start_game(size):
 
 
 
-
 start_game(board_size)
 
 
 
 def move(btn,row,col):
     global moved
-    if moved==False:
-        global selected
-        if b[row,col]== play_color:
+    global turn
+
+    play_color = turn % 2
+    while turn<=2:
+        if moved==False:
+            global selected
+            if b[row,col]== play_color:
+                
             
-            for i in range(board_size):
-                for j in range(board_size):
-                    if b[i,j]==0:
-                        bo[i][j] =0
-                    #else:               
-                        #bo[i][j] =b[i,j]
-        
-            for dir in range(1,9):
-                legal_coord = legal(b,5,[row,col],dir) #resolver a questão do size
-                if isinstance(legal_coord, np.ndarray):
-                    bo[legal_coord[0]][legal_coord[1]]=3
+                for dir in range(1,9):
+                    legal_coord = legal(b,5,[row,col],dir) #resolver a questão do size
+                    if isinstance(legal_coord, np.ndarray):
+                        bo[legal_coord[0]][legal_coord[1]]=3
+                    
+                    
+                selected=True
+                global selected_piece
+                selected_piece=[row,col] 
+
+            elif  b[row,col]== 0 and selected==True:
+                move_piece(b,selected_piece,[row,col] )
+                bo[row][col] = play_color
+                bo[selected_piece[0]][selected_piece[1]]=0 
+                moved=True
                 
-                
-            selected=True
-            global selected_piece
-            selected_piece=[row,col] 
+                for i in range(board_size):
+                    for j in range(board_size):
+                        if b[i,j]==0:
+                            bo[i][j] =0
+                        #else:               
+                            #bo[i][j] =b[i,j]
+           
+                turn=turn+1
+                play_turn=2
 
-        elif  b[row,col]== 0 and selected==True:
-            move_piece(b,selected_piece,[row,col] )
-            bo[row][col] = play_color
-            bo[selected_piece[0]][selected_piece[1]]=0 
-            moved=True
-            for i in range(board_size):
-                for j in range(board_size):
-                    if b[i,j]==0:
-                        bo[i][j] =0
+                for i in range(board_size):
+                    for j in range(board_size):
+                        if b[i,j]==0:
+                            bo[i][j] =0
 
         
 
@@ -158,27 +165,32 @@ def move(btn,row,col):
 
 
 
-def player_turn():
-    selected=False
-    bo.print("Your turn, player",play_color)
-    global moved
-    moved=False
-    bo.on_mouse_click = move
+""" def player_turn():
+    
+    while turn<=2:       
+        if turn % 2 == 1:
+            play_color=1
+            #print(play_color)
+        elif turn % 2 == 0:
+            print(r2)
+            global moved
+            moved=False
+            selected=False
+            play_color=2
+            print(play_color)
+        
+        selected=False
+        bo.print("Your turn, player",play_color)
+        moved=False """
+        
 
+moved=False
+turn=1
+bo.on_mouse_click = move
 
+#player_turn()
+    
 
-
-def play_game():
-    global play_color
-    play_color=1
-    player_turn()
-    play_color=2
-    player_turn()
-
-
-
-
-play_game()
 
 
 
