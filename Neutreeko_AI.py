@@ -24,8 +24,8 @@ def init(b):
     # pieces_loc=np.array([[0,1],[0,3],[3,2],[1,2],[4,1],[4,3]])
     # return pieces_loc
 
-# init(b)
-inic(b)
+init(b)
+#inic(b)
 #Sets an array with the position of the pieces [1 1 1 2 2 2]
 def locationOfPieces(board):
     pieces_loc=np.array([[0,0]])
@@ -354,7 +354,96 @@ def evaluate(board,playerPiece):
                         points=3
     return points       
              
-print(b)
-print(evaluate(b,1)-evaluate(b,2))                    
+# print(b)
+# print(evaluate(b,1))                    
 
+
+#Minimax Search
+
+#All possible boards that can outcome from a player moving a piece
+def children(board,player):
+    pieces_loc=locationOfPieces(board)
+    board_children=np.array([np.zeros((size,size))])
+    
+    if player == 1:
+        play=pieces_loc[0:3]
+        ind1 = np.lexsort((play[:,1], play[:,0])) #sort the pieces top left to bottom right
+        play=play[ind1]
+    elif player == 2: 
+        play=pieces_loc[3:6]
+        ind2 = np.lexsort((play[:,1], play[:,0])) #sort the pieces top left to bottom right
+        play=play[ind2]
+     
+    test = board.copy()
+    for pos in play:
+        for direction in range(1,9):
+            move_piece(test, pos, legal(board,pos,direction) )
+            # concatenar os boards filhos que advem do movimento das peças de um jogador
+            if not np.array_equal(test,board):
+                Test3D = np.array([test])
+                board_children=np.concatenate( (board_children,Test3D) )
+                test = board.copy()
+                
+    
+    board_children=np.delete(board_children,0, 0)
+    return board_children
+
+# print(children(b,1).shape)
+
+def minimax(board,depth, maximizingPlayer):
+    
+    if depth == 0 and maximizingPlayer==True: #supondo que as peças 1 jogam primeiro
+        return evaluate(board,1)
+    elif depth == 0:
+        return -evaluate(board,2)
+    
+    if maximizingPlayer:
+        maxEval = -1000000
+        for child in children(board,1):
+            eval = minimax(child,depth-1, False)
+            maxEval = max(maxEval,eval)
             
+            if trueEval < maxEval:
+                
+                
+            trueEval = maxEval    
+            if depth==3 and :
+                return
+        
+        return maxEval
+    else:
+        minEval=1000000
+        for child in children(board,2):
+            eval = minimax(child,depth-1, True)
+            minEval=min(minEval,eval)
+        return minEval
+    
+def minimaxAB(board,depth,alpha,beta, maximizingPlayer):
+    if depth == 0 and maximizingPlayer==True: #supondo que as peças 1 jogam primeiro
+        return evaluate(board,1)
+    elif depth == 0:
+        return -evaluate(board,2)
+    
+    if maximizingPlayer:
+        maxEval = -1000000
+        for child in children(board,1):
+            eval = minimaxAB(child,depth-1,alpha,beta, False)
+            maxEval = max(maxEval,eval)
+            alpha = max(eval,alpha)
+            if beta <= alpha:
+                break
+        return maxEval
+    
+    else:
+        minEval=1000000
+        for child in children(board,2):
+            eval = minimax(child,depth-1, True)
+            minEval=min(minEval,eval)
+            beta = min(beta,eval)
+            if beta <= alpha:
+                break
+        return minEval
+    
+    
+# print(minimax(b,3,True))
+print(minimaxAB(b,3,-100000,100000,True))
