@@ -166,9 +166,19 @@ def player_turn():
     bo.on_mouse_click = move
 
 
-play_color=1
 
-player_turn()
+
+def play_game():
+    global play_color
+    play_color=1
+    player_turn()
+    play_color=2
+    player_turn()
+
+
+
+
+play_game()
 
 
 
