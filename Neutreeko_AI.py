@@ -7,12 +7,12 @@ size=5
 b=np.zeros((size,size))
 
 def inic(b):
-    b[0,2]=2
-    b[3,4]=2
-    b[4,4]=2
-    b[0,4]=1
-    b[1,0]=1
-    b[4,2]=1
+    b[4,1]=2
+    b[3,2]=2
+    b[2,3]=2
+    b[3,0]=1
+    b[0,0]=1
+    b[2,0]=1
 
 def init(b):
     b[0,1]=1
@@ -25,7 +25,7 @@ def init(b):
     # return pieces_loc
 
 init(b)
-#inic(b)
+# inic(b)
 #Sets an array with the position of the pieces [1 1 1 2 2 2]
 def locationOfPieces(board):
     pieces_loc=np.array([[0,0]])
@@ -108,7 +108,7 @@ def legal(board, coord, direction):
         
         
     if np.array_equal(new_pos,init_coord):
-        print("Move not possible")
+        # print("Move not possible")
         return init_coord
     else:
         return new_pos
@@ -142,7 +142,7 @@ def findPiece(board, coord, player, pieceNextTo):
             new_pos[0] = new_pos[0]-1
         else:
             empty=False
-            print('not found up')
+            # print('not found up')
     
     empty = True
     new_pos = coord[:]       
@@ -154,7 +154,7 @@ def findPiece(board, coord, player, pieceNextTo):
             new_pos[0] = new_pos[0]+1
         else:
             empty=False
-            print('not found down')
+            # print('not found down')
             
     empty = True
     new_pos = coord[:]       
@@ -166,7 +166,7 @@ def findPiece(board, coord, player, pieceNextTo):
             new_pos[1] = new_pos[1]+1
         else:
             empty=False
-            print('not found right')
+            # print('not found right')
             
     empty = True
     new_pos = coord[:]       
@@ -178,7 +178,7 @@ def findPiece(board, coord, player, pieceNextTo):
             new_pos[1] = new_pos[1]-1
         else:
             empty=False
-            print('not found left')
+            # print('not found left')
              
     empty = True
     new_pos = coord[:]       
@@ -191,7 +191,7 @@ def findPiece(board, coord, player, pieceNextTo):
             new_pos[1] = new_pos[1]+1
         else:
             empty=False
-            print('not found up right')
+            # print('not found up right')
                
     empty = True
     new_pos = coord[:]       
@@ -204,7 +204,7 @@ def findPiece(board, coord, player, pieceNextTo):
             new_pos[1] = new_pos[1]-1
         else:
             empty=False
-            print('not found up left')
+            # print('not found up left')
             
     empty = True
     new_pos = coord[:]       
@@ -217,7 +217,7 @@ def findPiece(board, coord, player, pieceNextTo):
             new_pos[1] = new_pos[1]+1
         else:
             empty=False
-            print('not found down right')        
+            # print('not found down right')        
             
     empty = True
     new_pos = coord[:]       
@@ -230,7 +230,7 @@ def findPiece(board, coord, player, pieceNextTo):
             new_pos[1] = new_pos[1]-1
         else:
             empty=False
-            print('not found down left')
+            # print('not found down left')
           
             
     new_pos = pieceNextTo[:] #caso não seja enontrado vem a coordenada da peça adjacente
@@ -247,35 +247,35 @@ def boundary(board,direction,coord):
         if direction == 1:
             if coord[0]+1 == size or (pos[0]==coord[0]+1 and pos[1]==coord[1]):
                 bounded = True
-                print('the lower boundary is in place and piece coming from the top will stop')
+                # print('the lower boundary is in place and piece coming from the top will stop')
         elif direction == 2:
             if coord[0]-1 == -1 or (pos[0]==coord[0]-1 and pos[1]==coord[1]):
                 bounded = True
-                print('the upper boundary is in place and piece coming from the bottom will stop')
+                # print('the upper boundary is in place and piece coming from the bottom will stop')
         elif direction == 3:
             if coord[1]-1 == -1 or (pos[0]==coord[0] and pos[1]==coord[1]-1):
                 bounded = True
-                print("there's a boundary in the left side")
+                # print("there's a boundary in the left side")
         elif direction == 4:
             if coord[1]+1 == size or (pos[0]==coord[0] and pos[1]==coord[1]+1):
                 bounded = True
-                print("there's a boundary in the right side")
+                # print("there's a boundary in the right side")
         elif direction == 5:
             if  coord[0]+1 == size or coord[1]-1 == -1 or (pos[0]==coord[0]+1 and pos[1]==coord[1]-1):
                 bounded = True
-                print("coming from up right it will be stopped")
+                # print("coming from up right it will be stopped")
         elif direction == 6:
             if coord[0]+1 == size or coord[1]+1 == size or (pos[0]==coord[0]+1 and pos[1]==coord[1]+1):
                 bounded = True
-                print("coming from up left it will be stopped")
+                # print("coming from up left it will be stopped")
         elif direction == 7:
             if coord[0]-1 == -1 or coord[1]-1 == -1 or (pos[0]==coord[0]-1 and pos[1]==coord[1]-1):
                 bounded = True
-                print("coming from down right it will be stopped")
+                # print("coming from down right it will be stopped")
         elif direction == 8:
             if coord[0]-1 == -1 or coord[1]+1 == size or (pos[0]==coord[0]-1 and pos[1]==coord[1]+1):
                 bounded = True
-                print("coming from down left it will be stopped")
+                # print("coming from down left it will be stopped")
         else:
             bounded = False
                 
@@ -308,20 +308,20 @@ def evaluate(board,playerPiece):
         play=play[ind2]
     
     points = 0
-    
-    for ind in range(0,2):
+    for ind in range(0,2): # esperando que so se joga com 3 peças
         for p in range(-1,2):
             for q in range(-1,2):
                 if play[ind][0]+p==play[ind+1][0] and play[ind][1]+q==play[ind+1][1]: # it's beter
                     # if play[ind][0]+p >= 0 and play[ind][0]+p <= size-1 and play[ind][1]+q >= 0 and play[ind][1]+q <= size-1 and board[play[ind][0]+p,play[ind][1]+q] == board[play[ind][0],play[ind][1]]... tentava desnecessaria
-
+                    
                     #2 peças juntas
                     
-                    if piece_count == 0 and ind == 0 and ( (play[ind][0]+p+p==play[ind+2][0] and play[ind][1]+q+q==play[ind+2][1]) or (play[ind][0]-p==play[ind+2][0] and play[ind][1]-q==play[ind+2][1]) ):
+                    if piece_count == 0 and ind == 0 and ( (play[ind][0]+p+p==play[ind+2][0] and play[ind][1]+q+q==play[ind+2][1]) or ( play[ind][0]-p==play[ind+2][0] and play[ind][1]-q==play[ind+2][1]) ):
                         points = 100
+                        return points
                         #3 em linha - vitoria - 100pts
                         
-                    elif piece_count == 0 and play[ind][0]+p+p != -1 and play[ind][1]+q+q !=-1 and play[ind][0]+p+p != size and play[ind][1]+q+q != size :
+                    if piece_count == 0 and play[ind][0]+p+p != -1 and play[ind][1]+q+q !=-1 and play[ind][0]+p+p != size and play[ind][1]+q+q != size :
                         #função para encontrar peça e função para ver se está barrado 
                         blank_coord = [play[ind][0]+p+p,play[ind][1]+q+q]
                         nextToPiece = [play[ind][0]+p,play[ind][1]+q]
@@ -329,33 +329,48 @@ def evaluate(board,playerPiece):
                         pos_piece3, direction = findPiece(b,blank_coord,player,nextToPiece)
                         if boundary(b,direction,blank_coord):
                             points=10
+                            return points
                             #temos 2 peças em linha e o espaço seguinte em branco, na proxima jogada, pode ser preenchido com a peça que falta
                         elif not np.array_equal(pos_piece3,nextToPiece) and ( (pos_piece3[0]-nextToPiece[0])**2 == 0 or (pos_piece3[0]-nextToPiece[0])**2 == 1 ) and ( (pos_piece3[1]-nextToPiece[1])**2 == 0 or (pos_piece3[1]-nextToPiece[1])**2 == 1 ):
                             points = 5
+                            return points
                             #3 peças em conjunto em direcoes diferentes
                     
-                    elif piece_count == 0 and play[ind][0]-p != -1 and play[ind][1]-q != -1 and play[ind][0]-p != size and play[ind][1]-q != size:
+                    if piece_count == 0 and play[ind][0]-p != -1 and play[ind][1]-q != -1 and play[ind][0]-p != size and play[ind][1]-q != size:
                         blank_coord = [play[ind][0]-p,play[ind][1]-q]
                         nextToPiece = [play[ind][0],play[ind][1]]
                         player = board[play[ind][0],play[ind][1]]
                         pos_piece3, direction = findPiece(b,blank_coord,player,nextToPiece)
                         if boundary(b,direction,blank_coord):
                             points=10
+                            return points
                             #temos 2 peças em linha e o espaço seguinte em branco, na proxima jogada, pode ser preenchido com a peça que falta
                         elif not np.array_equal(pos_piece3,nextToPiece) and ( (pos_piece3[0]-nextToPiece[0])**2 == 0 or (pos_piece3[0]-nextToPiece[0])**2 == 1 ) and ( (pos_piece3[1]-nextToPiece[1])**2 == 0 or (pos_piece3[1]-nextToPiece[1])**2 == 1 ):
                             points=5
+                            return points
                             #3 peças em conjunto em direcoes diferentes
                     
                     piece_count=piece_count+1
                     if piece_count==2:
                         points=5 #3 peças em conjunto em direcoes diferentes, ex: canto
+                        return points
+                        
                     
-                    if p==1 and q==1 and points==0: #se no ultimo quadrado que está a ser avaliado nao tiver surgido nada do que esta anterior
+                    if points==0: #se no ultimo quadrado que está a ser avaliado nao tiver surgido nada do que esta anterior    
                         points=3
+                        
+                        
+                elif ind == 0 and play[ind][0]+p==play[ind+2][0] and play[ind][1]+q==play[ind+2][1]: # we know we are dealing with 0 and 2, por isso falta ver onde esta o 1 em relacao!
+                    
+                    if points==0: #se no ultimo quadrado que está a ser avaliado nao tiver surgido nada do que esta anterior    
+                        points=3
+                        
+                       
+             
     return points       
              
 # print(b)
-# print(evaluate(b,1))                    
+# print(evaluate(b,2))                    
 
 
 #Minimax Search
@@ -388,62 +403,102 @@ def children(board,player):
     board_children=np.delete(board_children,0, 0)
     return board_children
 
-# print(children(b,1).shape)
+# print(children(b,1).shape[0]) # Branching factor of that board
 
-def minimax(board,depth, maximizingPlayer):
+def gameover(board):
+    #por a margem como noventa
+    if evaluate(board,1) >= 90:
+        #player 1 ganhou
+        return True
+    elif evaluate(board,2) <= -90:
+        #player2 ganhou
+        return True
+    else:
+        return False
+
+def minimax(board,depth,init_d, maximizingPlayer):
     
-    if depth == 0 and maximizingPlayer==True: #supondo que as peças 1 jogam primeiro
-        return evaluate(board,1)
-    elif depth == 0:
-        return -evaluate(board,2)
+    if depth == 0 or gameover(board):
+        ev=evaluate(board,1)-evaluate(board,2)
+        return ev
     
     if maximizingPlayer:
         maxEval = -1000000
         for child in children(board,1):
-            eval = minimax(child,depth-1, False)
-            maxEval = max(maxEval,eval)
+            eval = minimax(child,depth-1,init_d, False)
+            # print('board: \n',child,'\n\n eval: ',eval, ' maxEval: ', maxEval)
             
-            if trueEval < maxEval:
+            if depth==init_d and eval > maxEval: #definida como 3 pq é o valor razoavel
                 
+                save = child.copy()
                 
-            trueEval = maxEval    
-            if depth==3 and :
-                return
+            maxEval = max(maxEval,eval)    
+            if depth == init_d and np.array_equal(child,children(board,1)[children(board,1).shape[0]-1]): # se tivermos a avaliar a ultima child
+                return maxEval, save
         
         return maxEval
     else:
         minEval=1000000
         for child in children(board,2):
-            eval = minimax(child,depth-1, True)
-            minEval=min(minEval,eval)
+            eval = minimax(child,depth-1,init_d, True)
+            # print('board: \n',child,'\n\n eval: ',eval,  ' minEval: ', minEval)
+            
+            if depth==init_d and eval < minEval: #definida como 3
+                save = child.copy()
+                   
+            minEval=min(minEval,eval)    
+            if depth == init_d and np.array_equal(child,children(board,1)[children(board,1).shape[0]-1]): # se tivermos a avaliar a ultima child
+                return minEval, save
+              
         return minEval
     
-def minimaxAB(board,depth,alpha,beta, maximizingPlayer):
-    if depth == 0 and maximizingPlayer==True: #supondo que as peças 1 jogam primeiro
-        return evaluate(board,1)
-    elif depth == 0:
-        return -evaluate(board,2)
+    
+    
+def minimaxAB(board,depth,init_d,alpha,beta, maximizingPlayer):
+    if depth == 0 or gameover(board):
+        return evaluate(board,1)-evaluate(board,2)
     
     if maximizingPlayer:
         maxEval = -1000000
         for child in children(board,1):
-            eval = minimaxAB(child,depth-1,alpha,beta, False)
+            eval = minimaxAB(child,depth-1,init_d,alpha,beta, False)
+            # print('board: \n',child,'\n\n eval: ',eval, ' maxEval: ', maxEval)
+            
+            if depth==init_d and eval > maxEval: #definida como 3 pq é o valor razoavel
+                save = child.copy()
+            
             maxEval = max(maxEval,eval)
+            
+            
+            
             alpha = max(eval,alpha)
             if beta <= alpha:
                 break
+            
+        if depth == init_d and np.array_equal(child,children(board,1)[children(board,1).shape[0]-1]): # se tivermos a avaliar a ultima child
+            return maxEval, save
+            
         return maxEval
     
     else:
         minEval=1000000
         for child in children(board,2):
-            eval = minimax(child,depth-1, True)
+            eval = minimaxAB(child,depth-1,init_d,alpha,beta, True)
+            # print('board: \n',child,'\n\n eval: ',eval,  ' minEval: ', minEval)
+            
+            if depth==init_d and eval < minEval: #definida como 3
+                save = child.copy()
+            
             minEval=min(minEval,eval)
             beta = min(beta,eval)
             if beta <= alpha:
                 break
+            
+        if depth == init_d and np.array_equal(child,children(board,1)[children(board,1).shape[0]-1]): # se tivermos a avaliar a ultima child
+            return minEval, save
+            
         return minEval
     
     
-# print(minimax(b,3,True))
-print(minimaxAB(b,3,-100000,100000,True))
+# print(minimax(b,3,3,True))
+print(minimaxAB(b,3,3,-100000,100000,True))
