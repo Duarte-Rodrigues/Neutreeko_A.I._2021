@@ -540,7 +540,7 @@ def move_piece_GUI(board, init_coord, final_coord ):
         board[final_coord[0]][final_coord[1]] = board[init_coord[0]][init_coord[1]]
         board[init_coord[0]][init_coord[1]]=0        
         
-def show_possibilities(btn,row,col):
+def HumanVsHuman(btn,row,col):
     global click
     global origin
     global selected
@@ -604,7 +604,7 @@ if answer == 7:
     origin=[-1,-1]
     selected = False
     turn=0    
-    bo.on_mouse_click = show_possibilities
+    bo.on_mouse_click = HumanVsHuman
     bo.show()
 
 
