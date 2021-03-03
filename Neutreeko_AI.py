@@ -7,26 +7,25 @@ size=5
 
 b=np.zeros((size,size))
 
-def inic(b):
-    b[4,1]=2
-    b[3,2]=2
-    b[2,3]=2
-    b[3,0]=1
-    b[0,0]=1
-    b[2,0]=1
 
-def init(b):
-    b[0,1]=1
-    b[0,3]=1
-    b[3,2]=1
-    b[1,2]=2
-    b[4,1]=2
-    b[4,3]=2
-    # pieces_loc=np.array([[0,1],[0,3],[3,2],[1,2],[4,1],[4,3]])
-    # return pieces_loc
+def inic(board):
+    board[4,0]=2
+    board[4,4]=2
+    board[4,3]=2
+    board[0,0]=1
+    board[1,0]=1
+    board[4,2]=1
 
-init(b)
-# inic(b)
+def init(board):
+    board[0,1]=1
+    board[0,3]=1
+    board[3,2]=1
+    board[1,2]=2
+    board[4,1]=2
+    board[4,3]=2
+
+# init(b)
+inic(b)
 #Sets an array with the position of the pieces [1 1 1 2 2 2]
 def locationOfPieces(board):
     pieces_loc=np.array([[0,0]])
@@ -237,7 +236,6 @@ def findPiece(board, coord, player, pieceNextTo):
     new_pos = pieceNextTo[:] #caso não seja enontrado vem a coordenada da peça adjacente
     return new_pos,direction
             
-    
            
 def boundary(board,direction,coord):
     #tipos de boundary - limite do tabuleiro ou peça no sitio
@@ -325,8 +323,8 @@ def evaluate(board,playerPiece):
                         blank_coord = [play[ind][0]+p+p,play[ind][1]+q+q]
                         nextToPiece = [play[ind][0]+p,play[ind][1]+q]
                         player = board[play[ind][0],play[ind][1]]
-                        pos_piece3, direction = findPiece(b,blank_coord,player,nextToPiece)
-                        if boundary(b,direction,blank_coord):
+                        pos_piece3, direction = findPiece(board,blank_coord,player,nextToPiece)
+                        if boundary(board,direction,blank_coord):
                             points=10
                             return points
                             #temos 2 peças em linha e o espaço seguinte em branco, na proxima jogada, pode ser preenchido com a peça que falta
@@ -339,8 +337,8 @@ def evaluate(board,playerPiece):
                         blank_coord = [play[ind][0]-p,play[ind][1]-q]
                         nextToPiece = [play[ind][0],play[ind][1]]
                         player = board[play[ind][0],play[ind][1]]
-                        pos_piece3, direction = findPiece(b,blank_coord,player,nextToPiece)
-                        if boundary(b,direction,blank_coord):
+                        pos_piece3, direction = findPiece(board,blank_coord,player,nextToPiece)
+                        if boundary(board,direction,blank_coord):
                             points=10
                             return points
                             #temos 2 peças em linha e o espaço seguinte em branco, na proxima jogada, pode ser preenchido com a peça que falta
@@ -369,13 +367,13 @@ def evaluate(board,playerPiece):
     return points       
              
 # print(b)
-# print(evaluate(b,2))                    
+# print(evaluate(b,1),' - ',evaluate(b,2),' = ',evaluate(b,1)-evaluate(b,2))                    
 
 
 #Minimax Search
 
 #All possible boards that can outcome from a player moving a piece
-def children(board,player):
+def children(board,player): #
     pieces_loc=locationOfPieces(board)
     board_children=np.array([np.zeros((size,size))])
     
@@ -398,116 +396,142 @@ def children(board,player):
                 board_children=np.concatenate( (board_children,Test3D) )
                 test = board.copy()
                 
+    board_children=np.delete(board_children,0, 0) #delete the padding element
     
-    board_children=np.delete(board_children,0, 0)
+    #Sort the boards according to their evaluation (speeds the alpha-beta)
+    eva=[]
+    for child in board_children:
+        ev=evaluate(child,1)-evaluate(child,2)
+        eva.append(ev)
+    
+    eva=np.array(eva)
+    new_index = eva.argsort()[::-1]
+    board_children=board_children[new_index]
+    
     return board_children
 
-# print(children(b,1).shape[0]) # Branching factor of that board
+# print(children(b,1)[0:4]) # Branching factor of that board
 
 def gameover(board):
-    #por a margem como noventa
+    result=False
+
     if evaluate(board,1) >= 90:
         #player 1 ganhou
-        return True
-    elif evaluate(board,2) <= -90:
+        result = True
+    elif evaluate(board,2) >= 90:
         #player2 ganhou
-        return True
-    else:
-        return False
+        result = True
+    
+    return result
 
-def minimax(board,depth,init_d, maximizingPlayer):
+
+def minimax(board,depth, maximizingPlayer):
     
     if depth == 0 or gameover(board):
         ev=evaluate(board,1)-evaluate(board,2)
-        return ev
+        return (board,ev)
     
+    best_play=np.zeros((size,size))
     if maximizingPlayer:
         maxEval = -1000000
-        for child in children(board,1):
-            eval = minimax(child,depth-1,init_d, False)
-            # print('board: \n',child,'\n\n eval: ',eval, ' maxEval: ', maxEval)
-            
-            if depth==init_d and eval > maxEval: #definida como 3 pq é o valor razoavel
-                save = child.copy()
-                
-            maxEval = max(maxEval,eval)    
-            if depth == init_d and np.array_equal(child,children(board,1)[children(board,1).shape[0]-1]): # se tivermos a avaliar a ultima child
-                return maxEval, save
         
-        return maxEval
-    else:
-        minEval=1000000
-        for child in children(board,2):
-            eval = minimax(child,depth-1,init_d, True)
-            # print('board: \n',child,'\n\n eval: ',eval,  ' minEval: ', minEval)
-            
-            if depth==init_d and eval < minEval: #definida como 3
-                save = child.copy()
+        for child in children(board,1):
+            _, eval = minimax(child,depth-1, False)
                    
-            minEval=min(minEval,eval)    
-            if depth == init_d and np.array_equal(child,children(board,1)[children(board,1).shape[0]-1]): # se tivermos a avaliar a ultima child
-                return minEval, save
-              
-        return minEval
-        
-def minimaxAB(board,depth,init_d,alpha,beta, maximizingPlayer):
+            if eval > maxEval:
+                maxEval = eval
+                best_play = child
+                
+        return (best_play,maxEval)
+    else:
+        minEval=1000000
+        for child in children(board,2):
+            _, eval = minimax(child,depth-1, True) 
+                       
+            if eval < minEval:
+                minEval = eval
+                best_play = child
+
+        return (best_play,minEval)
+
+def minimaxAB(board,depth,alpha,beta, maximizingPlayer):
     if depth == 0 or gameover(board):
-        return evaluate(board,1)-evaluate(board,2)
+        ev=evaluate(board,1)-evaluate(board,2)
+        return (board,ev)
     
+    best_play=np.zeros((size,size))
     if maximizingPlayer:
         maxEval = -1000000
         for child in children(board,1):
-            eval = minimaxAB(child,depth-1,init_d,alpha,beta, False)
-            # print('board: \n',child,'\n\n eval: ',eval, ' maxEval: ', maxEval)
-            
-            if depth==init_d and eval > maxEval: #definida como 3 pq é o valor razoavel
-                save = child.copy()
-            
-            maxEval = max(maxEval,eval)
-            
-            
-            
+            _, eval = minimaxAB(child,depth-1,alpha,beta, False)
+
+            if eval > maxEval:
+                maxEval = eval
+                best_play = child
+
             alpha = max(eval,alpha)
-            if beta <= alpha:
+            if beta < alpha:
                 break
             
-        if depth == init_d and np.array_equal(child,children(board,1)[children(board,1).shape[0]-1]): # se tivermos a avaliar a ultima child
-            return maxEval, save
-            
-        return maxEval
+        return (best_play,maxEval)
     
     else:
         minEval=1000000
         for child in children(board,2):
-            eval = minimaxAB(child,depth-1,init_d,alpha,beta, True)
-            # print('board: \n',child,'\n\n eval: ',eval,  ' minEval: ', minEval)
+            _, eval = minimaxAB(child,depth-1,alpha,beta, True)
             
-            if depth==init_d and eval < minEval: #definida como 3
-                save = child.copy()
+            if eval < minEval:
+                minEval = eval
+                best_play = child
             
-            minEval=min(minEval,eval)
             beta = min(beta,eval)
-            if beta <= alpha:
+            if beta < alpha:
                 break
             
-        if depth == init_d and np.array_equal(child,children(board,1)[children(board,1).shape[0]-1]): # se tivermos a avaliar a ultima child
-            return minEval, save
-            
-        return minEval
+        return (best_play,minEval)
     
-    
-# print(minimax(b,3,3,True))
-# print(minimaxAB(b,3,3,-100000,100000,True))
+
+print(b)
+print(minimaxAB(b,5,-100000,100000,True))
+# print(minimax(b,1,True))
+
+# Pc vs Pc
+# t=0
+# best_p=b.copy()
+# print(b)
+# print('\n white first\n')
+# while gameover(best_p) == False:
+#     if t % 2==0:
+#         print('Player 1. to move: ')
+#         # best_p, eval=minimax(best_p,3,True)
+#         best_p, eval=minimaxAB(best_p,5,-100000,100000,True)
+#         print(best_p)
+#         print(evaluate(best_p,1),' - ',evaluate(best_p,2),' = ',evaluate(best_p,1)-evaluate(best_p,2),'\n')
+#         t+=1
+        
+#     elif t % 2 ==1:
+#         # best_p, eval=minimax(best_p,3,False)
+#         best_p, eval=minimaxAB(best_p,5,-100000,100000,False)
+#         print('Player 2. to move: ')
+#         print(best_p)
+#         print(evaluate(best_p,1),' - ',evaluate(best_p,2),' = ',evaluate(best_p,1)-evaluate(best_p,2),'\n')
+#         t+=1
 
 
 
-import ctypes 
 
-def Mbox(title,text,style):
-    return ctypes.windll.user32.MessageBoxW(0,text,title,style)
 
-answer=Mbox("   Welcome to Neutreeko",'      Do you want to play against the computer?\n        For computer VS computer game press:\n                                     -Cancel-', 3)
-#6 - yes / 7 - No/ 2 - Cancel
+# import ctypes 
+
+# def Mbox(title,text,style):
+#     return ctypes.windll.user32.MessageBoxW(0,text,title,style)
+
+# answer=Mbox("   Welcome to Neutreeko",'      Do you want to play against the computer?\n        For computer VS computer game press:\n                                     -Cancel-', 3)
+# #6 - yes / 7 - No/ 2 - Cancel
+
+# import easygui as eg
+
+# eg.buttonbox(msg="")
 
 
 # Neutreeko GUI 
@@ -546,7 +570,7 @@ def HumanVsHuman(btn,row,col):
     global selected
     global turn
     
-    if turn % 2 ==0:
+    if turn % 2 == 0:
         jog=1
     else:
         jog=2
@@ -598,14 +622,46 @@ def HumanVsHuman(btn,row,col):
 
 #Human vs Human Check basic
 
-if answer == 7:
-    start_game(size)
-    click=1
-    origin=[-1,-1]
-    selected = False
-    turn=0    
-    bo.on_mouse_click = HumanVsHuman
-    bo.show()
+# if answer == 7:
+# start_game(size)
+# click=1
+# origin=[-1,-1]
+# selected = False
+# turn=0    
 
 
 
+
+# def pcpc(str):
+#     t=0
+#     best_p=b.copy()
+#     print(b)
+#     print('\n white first\n')
+#     if str == 'KP_1':
+#         print('deu!!')
+        
+#     while gameover(best_p) == False:
+#         if t % 2==0:
+#             print('Player 1. to move: ')
+#             best_p, eval=minimax(best_p,3,True)
+#             arrayToGUI(best_p,bo)#se fizer isto assim tenho de definir o que é 0
+#             print(best_p)
+#             print(evaluate(best_p,1),' - ',evaluate(best_p,2),' = ',evaluate(best_p,1)-evaluate(best_p,2),'\n')
+
+#             t+=1
+#         elif t % 2 ==1:
+        
+#             best_p, eval=minimax(best_p,3,False)
+#             print('Player 2. to move: ')
+#             arrayToGUI(best_p,bo)
+#             print(best_p)
+#             print(evaluate(best_p,1),' - ',evaluate(best_p,2),' = ',evaluate(best_p,1)-evaluate(best_p,2),'\n')
+
+#             t+=1
+
+
+        
+# bo.on_key_press = pcpc        
+# bo.on_mouse_click = HumanVsHuman
+
+# bo.show()
