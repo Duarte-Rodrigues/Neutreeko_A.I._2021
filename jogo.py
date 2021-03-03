@@ -111,7 +111,8 @@ def start_game(size):
     bo._margin_color = "MediumSeaGreen"
     bo.create_output(background_color="MediumSeaGreen", color="black", font_size=12)
 
-
+def arrayToGUI(array_board,GUI_board):
+    
 
 start_game(board_size)
 
