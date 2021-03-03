@@ -428,7 +428,6 @@ def minimax(board,depth,init_d, maximizingPlayer):
             # print('board: \n',child,'\n\n eval: ',eval, ' maxEval: ', maxEval)
             
             if depth==init_d and eval > maxEval: #definida como 3 pq é o valor razoavel
-                
                 save = child.copy()
                 
             maxEval = max(maxEval,eval)    
@@ -502,11 +501,16 @@ def minimaxAB(board,depth,init_d,alpha,beta, maximizingPlayer):
 
 
 
+import ctypes 
+
+def Mbox(title,text,style):
+    return ctypes.windll.user32.MessageBoxW(0,text,title,style)
+
+answer=Mbox("   Welcome to Neutreeko",'      Do you want to play against the computer?\n        For computer VS computer game press:\n                                     -Cancel-', 3)
+#6 - yes / 7 - No/ 2 - Cancel
+
 
 # Neutreeko GUI 
-
-selected = False
-
 
 def arrayToGUI(array_board,GUI_board):
     pieces_loc=locationOfPieces(array_board)
@@ -520,8 +524,6 @@ def arrayToGUI(array_board,GUI_board):
         GUI_board[pos[0]][pos[1]]=value
         a=a+1
 
-
-
 def start_game(size):
     global bo 
     bo = Board(size, size)       
@@ -533,78 +535,34 @@ def start_game(size):
     bo._margin_color = "MediumSeaGreen"
     bo.create_output(background_color="MediumSeaGreen", color="black", font_size=12)
     
-start_game(size)
-
-  
-#mouse event
-# def move(btn,row,col):
-#     global moved
-#     global turn
-
-#     play_color = turn % 2 #play color = 0 ou 1
-    
-#     while turn<=2:
-#         if moved==False:
-#             global selected
-            
-#             if b[row,col] == play_color+1:
-
-#                 for dir in range(1,9):
-#                     legal_coord = legal(b,[row,col],dir) #resolver a questão do size
-#                     bo[legal_coord[0]][legal_coord[1]]=3
-                    
-#                 selected=True
-#                 global selected_piece
-#                 selected_piece=[row,col] 
-
-#             elif  b[row,col] == 0 and selected==True:
-                
-#                 move_piece(b,selected_piece,[row,col])
-#                 bo[row][col] = play_color
-#                 bo[selected_piece[0]][selected_piece[1]]=0 
-#                 moved=True
-                
-#                 for i in range(size):
-#                     for j in range(size):
-#                         if b[i,j]==0:
-#                             bo[i][j] = 0
-           
-#                 turn=turn+1
-
-
-# def player_turn():
-    
-#     while turn<=2:       
-#         if turn % 2 == 1:
-#             play_color=1
-#             #print(play_color)
-#         elif turn % 2 == 0:
-#             print(r2)
-#             global moved
-#             moved=False
-#             selected=False
-#             play_color=2
-#             print(play_color)
-        
-#         selected=False
-#         bo.print("Your turn, player",play_color)
-#         moved=False
-
-
 def move_piece_GUI(board, init_coord, final_coord ):
     if not np.array_equal(final_coord,init_coord):
         board[final_coord[0]][final_coord[1]] = board[init_coord[0]][init_coord[1]]
         board[init_coord[0]][init_coord[1]]=0        
         
-        
-
 def show_possibilities(btn,row,col):
-    #falta verificar se o selecionado esta de acordo com as piece_loc do jogador especifico
     global click
     global origin
     global selected
+    global turn
+    
+    if turn % 2 ==0:
+        jog=1
+    else:
+        jog=2
+
     pieces_loc=locationOfPieces(b)
-    for pos in pieces_loc:
+    
+    if jog == 1:
+        play=pieces_loc[0:3]
+        ind1 = np.lexsort((play[:,1], play[:,0])) #sort the pieces top left to bottom right
+        play=play[ind1]
+    elif jog == 2: 
+        play=pieces_loc[3:6]
+        ind2 = np.lexsort((play[:,1], play[:,0])) #sort the pieces top left to bottom right
+        play=play[ind2]
+ 
+    for pos in play:
         # print(click == 1 and np.array_equal(pos,[row,col]) and selected == False)
         # print(click == 2 and np.array_equal(origin,[row,col]) and selected == True)
         if click == 1 and np.array_equal(pos,[row,col]) and selected == False:
@@ -629,6 +587,7 @@ def show_possibilities(btn,row,col):
     if selected == True and bo[row][col]==3:
         move_piece_GUI(bo, origin, [row,col])
         move_piece(b,origin,[row,col])
+        turn=turn+1
         selected = False
         click=1
         for i in range(0,size):
@@ -636,36 +595,17 @@ def show_possibilities(btn,row,col):
                 if bo[i][j]==3:
                     bo[i][j]=0
 
-                    
-            
-            
-        
 
-    
+#Human vs Human Check basic
 
-
-print(b)
-turn=0
-
-click=1
-
-# select e move
-origin=[-1,-1]
-selected = False
-bo.on_mouse_click = show_possibilities #move
-
-# while game_continue:
-    
-    
-
-
-    
-    
-
-#player_turn()
-    
+if answer == 7:
+    start_game(size)
+    click=1
+    origin=[-1,-1]
+    selected = False
+    turn=0    
+    bo.on_mouse_click = show_possibilities
+    bo.show()
 
 
 
-
-bo.show()
