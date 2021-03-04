@@ -494,7 +494,6 @@ def start_game(size):
     bo.cell_color = "LightGreen"
     bo.margin = 25
     bo._margin_color = "MediumSeaGreen"
-    bo.create_output(background_color="MediumSeaGreen", color="black", font_size=12)
     
 def move_piece_GUI(board, init_coord, final_coord ):
     if not np.array_equal(final_coord,init_coord):
@@ -559,7 +558,7 @@ def HumanVsHuman(btn,row,col):
                         bo[i][j]=0
     
         if gameover(b) and jog==1:
-            if eg.ccbox(msg='\n\n\n\n                           Congratulations, White win!',title="Congratulations",choices=("Play again?","Quit!")):     # show a Continue/Cancel dialog
+            if eg.ccbox(msg='\n\n\n\n                           Congratulations, Black wins!',title="Congratulations",choices=("Play again?","Quit!")):     # show a Continue/Cancel dialog
                 b=np.zeros((size,size))
                 init(b)
                 arrayToGUI(b,bo)
@@ -568,7 +567,7 @@ def HumanVsHuman(btn,row,col):
                 bo.close()
             
         elif gameover(b) and jog==2:
-            if eg.ccbox(msg='\n\n\n\n                           Congratulations, Black win!',title="Congratulations",choices=("Play again?","Quit!")):     # show a Continue/Cancel dialog
+            if eg.ccbox(msg='\n\n\n\n                           Congratulations, White wins!',title="Congratulations",choices=("Play again?","Quit!")):     # show a Continue/Cancel dialog
                 b=np.zeros((size,size))
                 init(b)
                 arrayToGUI(b,bo)
@@ -655,7 +654,7 @@ def HumanVsComputer(btn,row,col):
                         turn=turn+1                  
     
         if gameover(b) and jog==1:
-            if eg.ccbox(msg='\n\n\n\n                           Congratulations, White win!',title="Congratulations",choices=("Play again?","Quit!")):     # show a Continue/Cancel dialog
+            if eg.ccbox(msg='\n\n\n\n                           Congratulations, Black wins!',title="Congratulations",choices=("Play again?","Quit!")):     # show a Continue/Cancel dialog
                 b=np.zeros((size,size))
                 init(b)
                 arrayToGUI(b,bo)
@@ -722,9 +721,9 @@ def ComputerVsComputer():
             turn=turn+1     
                    
         if gameover(b) and jog==1:
-            winner=eg.msgbox('\n\n\n\n                           The calculations do not Fail. White won!')
-        elif gameover(b) and jog==2:
             winner=eg.msgbox('\n\n\n\n                           The calculations do not Fail. Black won!')
+        elif gameover(b) and jog==2:
+            winner=eg.msgbox('\n\n\n\n                           The calculations do not Fail. White won!')
 
 def hint(key):
     global turn
