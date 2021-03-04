@@ -10,14 +10,15 @@ import time
 
 def init(board):
     board[0,1]=1
-    board[0,3]=1
-    board[3,2]=1
+    board[0,size-2]=1
+    board[size-2,2]=1
     board[1,2]=2
-    board[4,1]=2
-    board[4,3]=2
+    board[size-1,1]=2
+    board[size-1,size-2]=2
+    # print(board)
 
-#Sets an array with the position of the pieces [1 1 1 2 2 2]
 def locationOfPieces(board):
+    #Sets an array with the position of the board pieces [1 1 1 2 2 2]
     pieces_loc=np.array([[0,0]])
     for i in range(size):
         for j in range(size):
@@ -30,8 +31,8 @@ def locationOfPieces(board):
     pieces_loc=np.delete(pieces_loc,-1, 0)
     return pieces_loc
 
-#Checks legal moves
 def legal(board, coord, direction):
+    #Checks legal moves
     init_coord = np.array(coord)
     empty = True
     new_pos= np.array(coord)
@@ -338,8 +339,8 @@ def evaluate(board,playerPiece):
 
 #Minimax Search
 
-#All possible boards that can outcome in a player term
-def children(board,player): #
+def children(board,player):
+    #All possible boards that can outcome in a player term
     pieces_loc=locationOfPieces(board)
     board_children=np.array([np.zeros((size,size))])
     
@@ -356,7 +357,6 @@ def children(board,player): #
     for pos in play:
         for direction in range(1,9):
             move_piece(test, pos, legal(board,pos,direction) )
-            # concatenar os boards filhos que advem do movimento das peças de um jogador
             if not np.array_equal(test,board):
                 Test3D = np.array([test])
                 board_children=np.concatenate( (board_children,Test3D) )
@@ -364,7 +364,8 @@ def children(board,player): #
                 
     board_children=np.delete(board_children,0, 0) #delete the padding element
     
-    #Sort the boards according to their evaluation (speeds the alpha-beta)
+    # Sort the boards according to their evaluation (speeds the alpha-beta)
+    # If it was not sorted the level of accuracy is lower - lower level A.I.
     eva=[]
     for child in board_children:
         ev=evaluate(child,1)-evaluate(child,2)
@@ -490,12 +491,12 @@ def start_game(size):
     bo = Board(size, size)       
     arrayToGUI(b,bo)
     bo.title = "Neutreeko"
-    bo.cell_size = 120       
+    bo.cell_size = 72      
     bo.cell_color = "LightGreen"
-    bo.margin = 29
+    bo.margin = 20
     bo._margin_color = "MediumSeaGreen"
     bo.create_output(background_color="MediumSeaGreen", color="black", font_size=12)
-    bo.print('                                                               Black (Player 1) Moves First')
+    bo.print('          Black (Player 1) Moves First')
     
 def move_piece_GUI(board, init_coord, final_coord ):
     if not np.array_equal(final_coord,init_coord):
@@ -552,7 +553,7 @@ def HumanVsHuman(btn,row,col):
             move_piece_GUI(bo, origin, [row,col])
             move_piece(b,origin,[row,col])
             turn +=1
-            bo.print('Player',(turn % 2)+1,'to move! ','Heuristic Evaluation - Player 1:',evaluate(b,1),' Player 2:',-evaluate(b,2),' Total Evaluation: ',evaluate(b,1)-evaluate(b,2) )
+            bo.print('Player',(turn % 2)+1,'to move! ','Heuristic Evaluation - Player 1:',evaluate(b,1),'\nPlayer 2:',-evaluate(b,2),' Total Evaluation: ',evaluate(b,1)-evaluate(b,2) )
             selected = False
             click=1
             for i in range(0,size):
@@ -624,7 +625,7 @@ def HumanVsComputer(btn,row,col):
                 move_piece_GUI(bo, origin, [row,col])
                 move_piece(b,origin,[row,col])
                 turn=turn+1
-                bo.print('A.I. Engine to move!','Heuristic Evaluation - Player 1:',evaluate(b,1),' Player 2:',-evaluate(b,2),' Total Evaluation: ',evaluate(b,1)-evaluate(b,2) )
+                bo.print('A.I. Engine to move!','Heuristic Evaluation - Player 1:',evaluate(b,1),'\nPlayer 2:',-evaluate(b,2),' Total Evaluation: ',evaluate(b,1)-evaluate(b,2) )
                 selected = False
                 click=1
                 for i in range(0,size):
@@ -646,14 +647,14 @@ def HumanVsComputer(btn,row,col):
                             bo.pause(10,change_cursor=False)
                             best_p,eval=minimaxAB(b,3,-100000,100000,False)
                         elif level == "Minimax Depth = 5":
-                            eg.msgbox('\n\n                 Please wait for the Engine move (1,5 to 3 min)',ok_button='Go back to the board') 
+                            bo.print('Please wait for the Engine move (1,5 to 3 min)') 
                             #timer function - fazia print no terminal
                             best_p,eval=minimaxAB(b,5,-100000,100000,False)
                         elif level == 'Random Positioning':
                             best_p,eval = randomMove(b,jog)
                         
                         
-                        bo.print('Player',(turn % 2)+1,' to move!  Predicted «',level,'» evaluation:',eval, ' Current Board Eval:',evaluate(b,1)-evaluate(b,2) )
+                        bo.print('Player1 to move!  Predicted «',level,'» evaluation:',eval, '\nCurrent Board Eval:',evaluate(b,1)-evaluate(b,2) )
     
                         coord_init,coord_final=findMove(b,best_p)
                         move_piece_GUI(bo, coord_init,coord_final )
@@ -683,7 +684,6 @@ def ComputerVsComputer():
     global levelP1
     global levelP2
     
-    eg.msgbox('\n\n\n\n          Center the window of the game board before you continue',ok_button='Continue')
     
     while not gameover(b):
         jog=3
@@ -693,18 +693,16 @@ def ComputerVsComputer():
                 best_p,eval=minimax(b,1,True) #Minimax com depth 1 é uma greedy search
                 bo.pause(1500,change_cursor=False)
             elif levelP1 == "Minimax Depth = 3": #Minimax w/ Apha e Beta because it's faster 
-                #timer function - fazia print no terminal
                 best_p,eval=minimaxAB(b,3,-100000,100000,True)
                 bo.pause(10,change_cursor=False)
             elif levelP1 == "Minimax Depth = 5 (1,5 min to 3 min per move)":
-                # eg.msgbox('\n\n                       Please wait for the Engine move (1,5 to 3 min)',ok_button='Go back to the board') 
-                #timer function - fazia print no terminal
+                bo.print('Please wait for the Engine move (1,5 to 3 min)') 
                 best_p,eval=minimaxAB(b,5,-100000,100000,True)
             elif levelP1 == 'Random Positioning':
                 best_p,eval = randomMove(b,jog)
                 bo.pause(1500,change_cursor=False)
                 
-            bo.print('Player2 to move!  Predicted P1«',levelP1,'» evaluation:',eval, ' Current Board Eval:',evaluate(b,1)-evaluate(b,2) )
+            bo.print('Player2 to move!\nPredicted P1«',levelP1,'» evaluation:',eval,'\nCurrent Board Eval:',evaluate(b,1)-evaluate(b,2) )
 
 
         else:
@@ -713,18 +711,16 @@ def ComputerVsComputer():
                 best_p,eval=minimax(b,1,False) #Minimax com depth 1 é uma greedy search
                 bo.pause(1500,change_cursor=False)
             elif levelP2 == "Minimax Depth = 3": #Minimax w/ Apha e Beta because it's faster
-                #timer function - fazia print no terminal
                 best_p,eval=minimaxAB(b,3,-100000,100000,False)
                 bo.pause(10,change_cursor=False)
             elif levelP2 == "Minimax Depth = 5":
-                # eg.msgbox('\n\n                       Please wait for the Engine move (1,5 to 3 min)',ok_button='Go back to the board') 
-                #timer function - fazia print no terminal
+                bo.print('Please wait for the Engine move (1,5 to 3 min)') 
                 best_p,eval=minimaxAB(b,5,-100000,100000,False)
             elif levelP2 == 'Random Positioning':
                 best_p,eval = randomMove(b,jog)
                 bo.pause(1500,change_cursor=False)
                 
-            bo.print('Player1 to move!  Predicted P2«',levelP2,'» evaluation:',eval, ' Current Board Eval:',evaluate(b,1)-evaluate(b,2) )
+            bo.print('Player1 to move!\nPredicted P2«',levelP2,'» evaluation:',eval,'\nCurrent Board Eval:',evaluate(b,1)-evaluate(b,2) )
 
       
         if not gameover(b):      
@@ -734,9 +730,9 @@ def ComputerVsComputer():
             turn=turn+1     
                    
         if gameover(b) and jog==1:
-            winner=eg.msgbox('\n\n\n\n                           The calculations do not Fail. Black won!')
+            winner=eg.msgbox('\n\n\n\n                      The calculations do not Fail. Black won!')
         elif gameover(b) and jog==2:
-            winner=eg.msgbox('\n\n\n\n                           The calculations do not Fail. White won!')
+            winner=eg.msgbox('\n\n\n\n                      The calculations do not Fail. White won!')
 
 def hint(key):
     global turn
@@ -808,6 +804,7 @@ if __name__ == "__main__":
         levelP2=eg.buttonbox(msg="\n\n\n                       What is the Player 2 A.I. Level?", title="Engine Level", choices=("Random Positioning","Greedy","Minimax Depth = 3","Minimax Depth = 5 (1,5 min to 3 min per move)"))
         if not (levelP1 == None or levelP2 == None):
             eg.msgbox("                         The automatic Game will start!\n            Please account for the time each Engine Level takes to play",ok_button='Start')
+            
             start_game(size)
             bo.on_start = ComputerVsComputer
             bo.show()
