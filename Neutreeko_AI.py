@@ -494,6 +494,7 @@ def start_game(size):
     bo.cell_color = "LightGreen"
     bo.margin = 25
     bo._margin_color = "MediumSeaGreen"
+    bo.create_output(background_color="MediumSeaGreen", color="black", font_size=12)
     
 def move_piece_GUI(board, init_coord, final_coord ):
     if not np.array_equal(final_coord,init_coord):
@@ -556,6 +557,7 @@ def HumanVsHuman(btn,row,col):
                 for j in range(0,size):
                     if bo[i][j]==3:
                         bo[i][j]=0
+            
     
         if gameover(b) and jog==1:
             if eg.ccbox(msg='\n\n\n\n                           Congratulations, Black wins!',title="Congratulations",choices=("Play again?","Quit!")):     # show a Continue/Cancel dialog
@@ -759,22 +761,24 @@ if __name__ == "__main__":
     while not(rules==None or welcome==None or welcome == "PLAY!" or rules == False):
         welcome=eg.buttonbox(msg="\n\n\n\n                               Welcome to Neutreko", title="Neutreeko", choices=("PLAY!","Game Rules") )
         if welcome=="PLAY!":
-            start_game(size)
             mode=eg.buttonbox(msg="\n\n\n                         Which mode would you like to play?\n                 To get a hint while playing press the right arrow", title="Let's Play!", choices=("Human VS Human","Human Vs Computer","Computer VS Computer"))
         elif welcome== "Game Rules":
-            rules=eg.ccbox(msg="-Movement: A piece slides orthogonally or diagonally until stopped by \nan occupied square or the border of the board. Black always moves first.\n\n -Objective: To get three in a row, orthogonally or diagonally. The row must be connected.",
+            rules=eg.ccbox(msg="-Movement: A piece slides orthogonally or diagonally until stopped by \nan occupied square or the border of the board. Black always moves first.\n\n -Objective: To get three in a row, orthogonally or diagonally. The row must be connected.\n\nIf you need a Hint, click on the RIGHT ARROW on your keyboard (be aware it takes 2 secons do appear). The blue ball represents the piece you should move, and red ball is the suggested square to move.",
                         title="Neutreeko Game Rules",choices=("Go back to Main Menu","Cancel"))
         
 
     if mode == "Human VS Human":
+        start_game(size)
         click=1
         origin=[-1,-1]
         selected = False
         turn=0    
         bo.on_mouse_click = HumanVsHuman
         bo.on_key_press = hint
+        bo.show()
         
     elif mode=="Human Vs Computer":
+        start_game(size)
         click=1
         origin=[-1,-1]
         selected = False
@@ -782,8 +786,10 @@ if __name__ == "__main__":
         level=eg.buttonbox(msg="\n                           Human goes First \n\n                           What is the A.I. Level?", title="Engine Level", choices=("Random Positioning","Greedy","Minimax Depth = 3","Minimax Depth = 5 (1,5 min to 3 min per move)"))
         bo.on_mouse_click = HumanVsComputer
         bo.on_key_press = hint
+        bo.show()
         
     elif mode == "Computer VS Computer":
+        start_game(size)
         turn=0
         levelP1=eg.buttonbox(msg="\n\n\n                       What is the Player 1 A.I. Level?", title="Engine Level", choices=("Random Positioning","Greedy","Minimax Depth = 3","Minimax Depth = 5 (1,5 min to 3 min per move)"))
         levelP2=eg.buttonbox(msg="\n\n\n                       What is the Player 2 A.I. Level?", title="Engine Level", choices=("Random Positioning","Greedy","Minimax Depth = 3","Minimax Depth = 5 (1,5 min to 3 min per move)"))
@@ -791,6 +797,6 @@ if __name__ == "__main__":
         eg.msgbox("                         The automatic Game will start!\n            Please account for the time each Engine Level takes to play",ok_button='Start')
         
         bo.on_start = ComputerVsComputer
+        bo.show()
 
     
-    bo.show()
