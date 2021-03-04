@@ -492,9 +492,10 @@ def start_game(size):
     bo.title = "Neutreeko"
     bo.cell_size = 120       
     bo.cell_color = "LightGreen"
-    bo.margin = 25
+    bo.margin = 29
     bo._margin_color = "MediumSeaGreen"
     bo.create_output(background_color="MediumSeaGreen", color="black", font_size=12)
+    bo.print('                                                               Black (Player 1) Moves First')
     
 def move_piece_GUI(board, init_coord, final_coord ):
     if not np.array_equal(final_coord,init_coord):
@@ -550,7 +551,8 @@ def HumanVsHuman(btn,row,col):
         if selected == True and bo[row][col]==3:
             move_piece_GUI(bo, origin, [row,col])
             move_piece(b,origin,[row,col])
-            turn=turn+1
+            turn +=1
+            bo.print('Player',(turn % 2)+1,'to move! ','Heuristic Evaluation - Player 1:',evaluate(b,1),' Player 2:',-evaluate(b,2),' Total Evaluation: ',evaluate(b,1)-evaluate(b,2) )
             selected = False
             click=1
             for i in range(0,size):
@@ -622,6 +624,7 @@ def HumanVsComputer(btn,row,col):
                 move_piece_GUI(bo, origin, [row,col])
                 move_piece(b,origin,[row,col])
                 turn=turn+1
+                bo.print('A.I. Engine to move!','Heuristic Evaluation - Player 1:',evaluate(b,1),' Player 2:',-evaluate(b,2),' Total Evaluation: ',evaluate(b,1)-evaluate(b,2) )
                 selected = False
                 click=1
                 for i in range(0,size):
@@ -637,19 +640,21 @@ def HumanVsComputer(btn,row,col):
                     else:
                         jog=2 #USAR A EVAL DO MINIMAX QUANDO TIVER o terminal
                         if level == "Greedy":
-                            best_p,_=minimax(b,1,False) #Minimax com depth 1 é uma greedy search
+                            best_p,eval=minimax(b,1,False) #Minimax com depth 1 é uma greedy search
                         elif level == "Minimax Depth = 3": #Minimax w/ Apha e Beta because it's faster 
                             #timer function - fazia print no terminal
                             bo.pause(10,change_cursor=False)
-                            best_p,_=minimaxAB(b,3,-100000,100000,False)
-                        elif level == "Minimax Depth = 5 (1,5 min to 3 min per move)":
-                            eg.msgbox('\n\n                       Please wait for the Engine move (1,5 to 3 min)',ok_button='Go back to the board') 
+                            best_p,eval=minimaxAB(b,3,-100000,100000,False)
+                        elif level == "Minimax Depth = 5":
+                            eg.msgbox('\n\n                 Please wait for the Engine move (1,5 to 3 min)',ok_button='Go back to the board') 
                             #timer function - fazia print no terminal
-                            best_p,_=minimaxAB(b,5,-100000,100000,False)
+                            best_p,eval=minimaxAB(b,5,-100000,100000,False)
                         elif level == 'Random Positioning':
-                            best_p,_ = randomMove(b,jog)
+                            best_p,eval = randomMove(b,jog)
                         
-                            
+                        
+                        bo.print('Player',(turn % 2)+1,' to move!  Predicted «',level,'» evaluation:',eval, ' Current Board Eval:',evaluate(b,1)-evaluate(b,2) )
+    
                         coord_init,coord_final=findMove(b,best_p)
                         move_piece_GUI(bo, coord_init,coord_final )
                         move_piece(b,coord_init,coord_final)
@@ -679,43 +684,49 @@ def ComputerVsComputer():
     global levelP2
     
     eg.msgbox('\n\n\n\n          Center the window of the game board before you continue',ok_button='Continue')
+    
     while not gameover(b):
         jog=3
         if turn % 2 == 0:
             jog=1
             if levelP1 == "Greedy":
-                best_p,_=minimax(b,1,True) #Minimax com depth 1 é uma greedy search
+                best_p,eval=minimax(b,1,True) #Minimax com depth 1 é uma greedy search
                 bo.pause(1500,change_cursor=False)
             elif levelP1 == "Minimax Depth = 3": #Minimax w/ Apha e Beta because it's faster 
                 #timer function - fazia print no terminal
-                best_p,_=minimaxAB(b,3,-100000,100000,True)
+                best_p,eval=minimaxAB(b,3,-100000,100000,True)
                 bo.pause(10,change_cursor=False)
             elif levelP1 == "Minimax Depth = 5 (1,5 min to 3 min per move)":
                 # eg.msgbox('\n\n                       Please wait for the Engine move (1,5 to 3 min)',ok_button='Go back to the board') 
                 #timer function - fazia print no terminal
-                best_p,_=minimaxAB(b,5,-100000,100000,True)
+                best_p,eval=minimaxAB(b,5,-100000,100000,True)
             elif levelP1 == 'Random Positioning':
-                best_p,_ = randomMove(b,jog)
+                best_p,eval = randomMove(b,jog)
                 bo.pause(1500,change_cursor=False)
+                
+            bo.print('Player2 to move!  Predicted P1«',levelP1,'» evaluation:',eval, ' Current Board Eval:',evaluate(b,1)-evaluate(b,2) )
+
 
         else:
             jog=2
             if levelP2 == "Greedy":
-                best_p,_=minimax(b,1,False) #Minimax com depth 1 é uma greedy search
+                best_p,eval=minimax(b,1,False) #Minimax com depth 1 é uma greedy search
                 bo.pause(1500,change_cursor=False)
             elif levelP2 == "Minimax Depth = 3": #Minimax w/ Apha e Beta because it's faster
                 #timer function - fazia print no terminal
-                best_p,_=minimaxAB(b,3,-100000,100000,False)
+                best_p,eval=minimaxAB(b,3,-100000,100000,False)
                 bo.pause(10,change_cursor=False)
-            elif levelP2 == "Minimax Depth = 5 (1,5 min to 3 min per move)":
+            elif levelP2 == "Minimax Depth = 5":
                 # eg.msgbox('\n\n                       Please wait for the Engine move (1,5 to 3 min)',ok_button='Go back to the board') 
                 #timer function - fazia print no terminal
-                best_p,_=minimaxAB(b,5,-100000,100000,False)
+                best_p,eval=minimaxAB(b,5,-100000,100000,False)
             elif levelP2 == 'Random Positioning':
-                best_p,_ = randomMove(b,jog)
+                best_p,eval = randomMove(b,jog)
                 bo.pause(1500,change_cursor=False)
-
                 
+            bo.print('Player1 to move!  Predicted P2«',levelP2,'» evaluation:',eval, ' Current Board Eval:',evaluate(b,1)-evaluate(b,2) )
+
+      
         if not gameover(b):      
             coord_init,coord_final=findMove(b,best_p)
             move_piece_GUI(bo, coord_init,coord_final )
@@ -759,7 +770,7 @@ if __name__ == "__main__":
     rules=True
     mode="let's see"
     while not(rules==None or welcome==None or welcome == "PLAY!" or rules == False):
-        welcome=eg.buttonbox(msg="\n\n\n\n                               Welcome to Neutreko", title="Neutreeko", choices=("PLAY!","Game Rules") )
+        welcome=eg.buttonbox(msg="\n\n\n\n                               Welcome to Neutreeko", title="Neutreeko", choices=("PLAY!","Game Rules") )
         if welcome=="PLAY!":
             mode=eg.buttonbox(msg="\n\n\n                         Which mode would you like to play?\n                 To get a hint while playing press the right arrow", title="Let's Play!", choices=("Human VS Human","Human Vs Computer","Computer VS Computer"))
         elif welcome== "Game Rules":
@@ -783,7 +794,7 @@ if __name__ == "__main__":
         origin=[-1,-1]
         selected = False
         turn=0 
-        level=eg.buttonbox(msg="\n                           Human goes First \n\n                           What is the A.I. Level?", title="Engine Level", choices=("Random Positioning","Greedy","Minimax Depth = 3","Minimax Depth = 5 (1,5 min to 3 min per move)"))
+        level=eg.buttonbox(msg="\n                           Human goes First \n\n                           What is the A.I. Level?", title="Engine Level", choices=("Random Positioning","Greedy","Minimax Depth = 3","Minimax Depth = 5"))
         if level != None:
             start_game(size)
             bo.on_mouse_click = HumanVsComputer
