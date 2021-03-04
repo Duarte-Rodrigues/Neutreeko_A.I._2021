@@ -778,25 +778,27 @@ if __name__ == "__main__":
         bo.show()
         
     elif mode=="Human Vs Computer":
-        start_game(size)
+        
         click=1
         origin=[-1,-1]
         selected = False
         turn=0 
         level=eg.buttonbox(msg="\n                           Human goes First \n\n                           What is the A.I. Level?", title="Engine Level", choices=("Random Positioning","Greedy","Minimax Depth = 3","Minimax Depth = 5 (1,5 min to 3 min per move)"))
-        bo.on_mouse_click = HumanVsComputer
-        bo.on_key_press = hint
-        bo.show()
+        if level != None:
+            start_game(size)
+            bo.on_mouse_click = HumanVsComputer
+            bo.on_key_press = hint
+            bo.show()
         
     elif mode == "Computer VS Computer":
-        start_game(size)
+        
         turn=0
         levelP1=eg.buttonbox(msg="\n\n\n                       What is the Player 1 A.I. Level?", title="Engine Level", choices=("Random Positioning","Greedy","Minimax Depth = 3","Minimax Depth = 5 (1,5 min to 3 min per move)"))
         levelP2=eg.buttonbox(msg="\n\n\n                       What is the Player 2 A.I. Level?", title="Engine Level", choices=("Random Positioning","Greedy","Minimax Depth = 3","Minimax Depth = 5 (1,5 min to 3 min per move)"))
-
-        eg.msgbox("                         The automatic Game will start!\n            Please account for the time each Engine Level takes to play",ok_button='Start')
-        
-        bo.on_start = ComputerVsComputer
-        bo.show()
+        if not (levelP1 == None or levelP2 == None):
+            eg.msgbox("                         The automatic Game will start!\n            Please account for the time each Engine Level takes to play",ok_button='Start')
+            start_game(size)
+            bo.on_start = ComputerVsComputer
+            bo.show()
 
     
