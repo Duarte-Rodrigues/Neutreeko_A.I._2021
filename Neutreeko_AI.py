@@ -3,18 +3,10 @@
 import numpy as np
 import copy 
 from game2dboard import Board
-size=5
+import easygui as eg
+import random
+import time
 
-b=np.zeros((size,size))
-
-
-def inic(board):
-    board[4,0]=2
-    board[4,4]=2
-    board[4,3]=2
-    board[0,0]=1
-    board[1,0]=1
-    board[4,2]=1
 
 def init(board):
     board[0,1]=1
@@ -24,8 +16,6 @@ def init(board):
     board[4,1]=2
     board[4,3]=2
 
-# init(b)
-inic(b)
 #Sets an array with the position of the pieces [1 1 1 2 2 2]
 def locationOfPieces(board):
     pieces_loc=np.array([[0,0]])
@@ -117,15 +107,6 @@ def move_piece(board, init_coord, final_coord ):
     if not np.array_equal(final_coord,init_coord):
         board[final_coord[0],final_coord[1]] = board[init_coord[0],init_coord[1]]
         board[init_coord[0],init_coord[1]]=0
-
-
-#It is necessary to define the piece coordinates as an array
-# coord = [1,2]
-# print(b)
-
-# move_piece(b, coord, legal(b, coord, 8))
-
-# print(b) 
 
 #Heuristics
 
@@ -235,8 +216,7 @@ def findPiece(board, coord, player, pieceNextTo):
             
     new_pos = pieceNextTo[:] #caso não seja enontrado vem a coordenada da peça adjacente
     return new_pos,direction
-            
-           
+                       
 def boundary(board,direction,coord):
     #tipos de boundary - limite do tabuleiro ou peça no sitio
     #a direção vai ser a oposta
@@ -280,16 +260,6 @@ def boundary(board,direction,coord):
                 
     return bounded    
         
-# print(b)               
-# blank_coord=[3,3]
-# posi, dire = findPiece(b,blank_coord,2,[3,2])
-# print('the last piece pos is ', posi)
-# if boundary(b,dire,blank_coord):
-#     print('funcemina')
-# else:
-#     print('not bounded')
-
-
 def evaluate(board,playerPiece):
     pieces_loc=locationOfPieces(board)
     piece_count=0
@@ -365,14 +335,10 @@ def evaluate(board,playerPiece):
                        
              
     return points       
-             
-# print(b)
-# print(evaluate(b,1),' - ',evaluate(b,2),' = ',evaluate(b,1)-evaluate(b,2))                    
-
 
 #Minimax Search
 
-#All possible boards that can outcome from a player moving a piece
+#All possible boards that can outcome in a player term
 def children(board,player): #
     pieces_loc=locationOfPieces(board)
     board_children=np.array([np.zeros((size,size))])
@@ -408,9 +374,8 @@ def children(board,player): #
     new_index = eva.argsort()[::-1]
     board_children=board_children[new_index]
     
+    # print(board_children.shape[0]) # Branching factor of that board
     return board_children
-
-# print(children(b,1)[0:4]) # Branching factor of that board
 
 def gameover(board):
     result=False
@@ -424,6 +389,23 @@ def gameover(board):
     
     return result
 
+def findMove(init_board,final_board):
+    #return de tuple com coordenada inical e final da peça que se mexeu([,],[])
+    for i in range(0,size):
+        for j in range(0,size):
+            if init_board[i,j] != 0 and final_board[i,j]==0:
+                init_coord=[i,j]
+            elif init_board[i,j] == 0 and final_board[i,j]!=0:   
+                final_coord=[i,j]
+    return (init_coord,final_coord)
+       
+def randomMove(board,player):
+    board_children=children(board,player)
+    random.seed()
+    a=random.randint(0,board_children.shape[0]-1)
+    
+    eval=evaluate(board_children[a],1)-evaluate(board_children[a],2)
+    return board_children[a],eval
 
 def minimax(board,depth, maximizingPlayer):
     
@@ -490,63 +472,18 @@ def minimaxAB(board,depth,alpha,beta, maximizingPlayer):
             
         return (best_play,minEval)
     
-
-print(b)
-print(minimaxAB(b,5,-100000,100000,True))
-# print(minimax(b,1,True))
-
-# Pc vs Pc
-# t=0
-# best_p=b.copy()
-# print(b)
-# print('\n white first\n')
-# while gameover(best_p) == False:
-#     if t % 2==0:
-#         print('Player 1. to move: ')
-#         # best_p, eval=minimax(best_p,3,True)
-#         best_p, eval=minimaxAB(best_p,5,-100000,100000,True)
-#         print(best_p)
-#         print(evaluate(best_p,1),' - ',evaluate(best_p,2),' = ',evaluate(best_p,1)-evaluate(best_p,2),'\n')
-#         t+=1
-        
-#     elif t % 2 ==1:
-#         # best_p, eval=minimax(best_p,3,False)
-#         best_p, eval=minimaxAB(best_p,5,-100000,100000,False)
-#         print('Player 2. to move: ')
-#         print(best_p)
-#         print(evaluate(best_p,1),' - ',evaluate(best_p,2),' = ',evaluate(best_p,1)-evaluate(best_p,2),'\n')
-#         t+=1
-
-
-
-
-
-# import ctypes 
-
-# def Mbox(title,text,style):
-#     return ctypes.windll.user32.MessageBoxW(0,text,title,style)
-
-# answer=Mbox("   Welcome to Neutreeko",'      Do you want to play against the computer?\n        For computer VS computer game press:\n                                     -Cancel-', 3)
-# #6 - yes / 7 - No/ 2 - Cancel
-
-# import easygui as eg
-
-# eg.buttonbox(msg="")
-
-
-# Neutreeko GUI 
+# Neutreeko GUI
 
 def arrayToGUI(array_board,GUI_board):
-    pieces_loc=locationOfPieces(array_board)
-    a=0
-    for pos in pieces_loc:
-        if a <3:
-            value=1
-        else:
-            value=2
-            
-        GUI_board[pos[0]][pos[1]]=value
-        a=a+1
+    GUI_board.clear()
+    for i in range(0,size):
+            for j in range(0,size):
+                if array_board[i,j] == 0:
+                    GUI_board[i][j] = 0
+                elif array_board[i,j] == 1:
+                    GUI_board[i][j] = 1
+                elif array_board[i,j] == 2:
+                    GUI_board[i][j] = 2
 
 def start_game(size):
     global bo 
@@ -569,99 +506,292 @@ def HumanVsHuman(btn,row,col):
     global origin
     global selected
     global turn
+    global winner
+    global b
     
-    if turn % 2 == 0:
-        jog=1
-    else:
-        jog=2
+    if not gameover(b):
+        
+        if turn % 2 == 0:
+            jog=1
+        else:
+            jog=2
 
-    pieces_loc=locationOfPieces(b)
+        pieces_loc=locationOfPieces(b)
     
-    if jog == 1:
-        play=pieces_loc[0:3]
-        ind1 = np.lexsort((play[:,1], play[:,0])) #sort the pieces top left to bottom right
-        play=play[ind1]
-    elif jog == 2: 
-        play=pieces_loc[3:6]
-        ind2 = np.lexsort((play[:,1], play[:,0])) #sort the pieces top left to bottom right
-        play=play[ind2]
+        if jog == 1:
+            play=pieces_loc[0:3]
+            ind1 = np.lexsort((play[:,1], play[:,0])) #sort the pieces top left to bottom right
+            play=play[ind1]
+        elif jog == 2: 
+            play=pieces_loc[3:6]
+            ind2 = np.lexsort((play[:,1], play[:,0])) #sort the pieces top left to bottom right
+            play=play[ind2]
  
-    for pos in play:
-        # print(click == 1 and np.array_equal(pos,[row,col]) and selected == False)
-        # print(click == 2 and np.array_equal(origin,[row,col]) and selected == True)
-        if click == 1 and np.array_equal(pos,[row,col]) and selected == False:
-            for dir in range(1,9):
-                legal_coord = legal(b,[row,col],dir) #resolver a questão do size
-                if not np.array_equal(legal_coord,[row,col]):
-                    bo[legal_coord[0]][legal_coord[1]]=3       
-            click=2
-            selected = True
-            origin=[row,col]
-            break
-        elif click == 2 and np.array_equal(origin,[row,col]) and selected == True :
-            for dir in range(1,9):
-                legal_coord = legal(b,[row,col],dir) #resolver a questão do size
-                if not np.array_equal(legal_coord,[row,col]):
-                    bo[legal_coord[0]][legal_coord[1]]=0
-            click=1
+        for pos in play:
+            if click == 1 and np.array_equal(pos,[row,col]) and selected == False:
+                for dir in range(1,9):
+                    legal_coord = legal(b,[row,col],dir) #resolver a questão do size
+                    if not np.array_equal(legal_coord,[row,col]):
+                        bo[legal_coord[0]][legal_coord[1]]=3       
+                click=2
+                selected = True
+                origin=[row,col]
+                break
+            elif click == 2 and np.array_equal(origin,[row,col]) and selected == True :
+                for dir in range(1,9):
+                    legal_coord = legal(b,[row,col],dir) #resolver a questão do size
+                    if not np.array_equal(legal_coord,[row,col]):
+                        bo[legal_coord[0]][legal_coord[1]]=0
+                click=1
+                selected = False
+                origin=[-1,-1]
+                break
+        
+        if selected == True and bo[row][col]==3:
+            move_piece_GUI(bo, origin, [row,col])
+            move_piece(b,origin,[row,col])
+            turn=turn+1
             selected = False
-            origin=[-1,-1]
-            break
+            click=1
+            for i in range(0,size):
+                for j in range(0,size):
+                    if bo[i][j]==3:
+                        bo[i][j]=0
+    
+        if gameover(b) and jog==1:
+            if eg.ccbox(msg='\n\n\n\n                           Congratulations, White win!',title="Congratulations",choices=("Play again?","Quit!")):     # show a Continue/Cancel dialog
+                b=np.zeros((size,size))
+                init(b)
+                arrayToGUI(b,bo)
+                turn=0
+            else:
+                bo.close()
+            
+        elif gameover(b) and jog==2:
+            if eg.ccbox(msg='\n\n\n\n                           Congratulations, Black win!',title="Congratulations",choices=("Play again?","Quit!")):     # show a Continue/Cancel dialog
+                b=np.zeros((size,size))
+                init(b)
+                arrayToGUI(b,bo)
+                turn=0
+            else:
+                bo.close()
+    
+def HumanVsComputer(btn,row,col):
+    global click
+    global origin
+    global selected
+    global turn
+    global winner
+    global level
+    global b
+    
+    if not gameover(b):
         
-    if selected == True and bo[row][col]==3:
-        move_piece_GUI(bo, origin, [row,col])
-        move_piece(b,origin,[row,col])
-        turn=turn+1
-        selected = False
+        if turn % 2 == 0:
+            jog=1
+
+        pieces_loc=locationOfPieces(b)
+    
+        if jog == 1:
+            play=pieces_loc[0:3]
+            ind1 = np.lexsort((play[:,1], play[:,0])) #sort the pieces top left to bottom right
+            play=play[ind1]
+ 
+            for pos in play:
+                if click == 1 and np.array_equal(pos,[row,col]) and selected == False:
+                    for dir in range(1,9):
+                        legal_coord = legal(b,[row,col],dir) #resolver a questão do size
+                        if not np.array_equal(legal_coord,[row,col]):
+                            bo[legal_coord[0]][legal_coord[1]]=3       
+                    click=2
+                    selected = True
+                    origin=[row,col]
+                    break
+                elif click == 2 and np.array_equal(origin,[row,col]) and selected == True :
+                    for dir in range(1,9):
+                        legal_coord = legal(b,[row,col],dir) #resolver a questão do size
+                        if not np.array_equal(legal_coord,[row,col]):
+                            bo[legal_coord[0]][legal_coord[1]]=0
+                    click=1
+                    selected = False
+                    origin=[-1,-1]
+                    break
+        
+            if selected == True and bo[row][col]==3:
+                move_piece_GUI(bo, origin, [row,col])
+                move_piece(b,origin,[row,col])
+                turn=turn+1
+                selected = False
+                click=1
+                for i in range(0,size):
+                    for j in range(0,size):
+                        if bo[i][j]==3:
+                            bo[i][j]=0
+                
+                
+                if not gameover(b):
+                    #The AI plays immediatelly after the human            
+                    if turn % 2 == 0:
+                        jog=1
+                    else:
+                        jog=2 #USAR A EVAL DO MINIMAX QUANDO TIVER o terminal
+                        if level == "Greedy":
+                            best_p,_=minimax(b,1,False) #Minimax com depth 1 é uma greedy search
+                        elif level == "Minimax Depth = 3": #Minimax w/ Apha e Beta because it's faster 
+                            #timer function - fazia print no terminal
+                            bo.pause(10,change_cursor=False)
+                            best_p,_=minimaxAB(b,3,-100000,100000,False)
+                        elif level == "Minimax Depth = 5 (1,5 min to 3 min per move)":
+                            eg.msgbox('\n\n                       Please wait for the Engine move (1,5 to 3 min)',ok_button='Go back to the board') 
+                            #timer function - fazia print no terminal
+                            best_p,_=minimaxAB(b,5,-100000,100000,False)
+                        elif level == 'Random Positioning':
+                            best_p,_ = randomMove(b,jog)
+                        
+                            
+                        coord_init,coord_final=findMove(b,best_p)
+                        move_piece_GUI(bo, coord_init,coord_final )
+                        move_piece(b,coord_init,coord_final)
+                        turn=turn+1                  
+    
+        if gameover(b) and jog==1:
+            if eg.ccbox(msg='\n\n\n\n                           Congratulations, White win!',title="Congratulations",choices=("Play again?","Quit!")):     # show a Continue/Cancel dialog
+                b=np.zeros((size,size))
+                init(b)
+                arrayToGUI(b,bo)
+                turn=0
+            else:
+                bo.close()   
+        elif gameover(b) and jog==2:
+            if eg.ccbox(msg='\n\n\n\n                           You will beat it next time!',title="Retry?",choices=("Play again?","Quit!")):     # show a Continue/Cancel dialog
+                b=np.zeros((size,size))
+                init(b)
+                arrayToGUI(b,bo)
+                turn=0
+            else:
+                bo.close()
+
+def ComputerVsComputer():
+    global turn
+    global winner
+    global levelP1
+    global levelP2
+    
+    eg.msgbox('\n\n\n\n          Center the window of the game board before you continue',ok_button='Continue')
+    while not gameover(b):
+        jog=3
+        if turn % 2 == 0:
+            jog=1
+            if levelP1 == "Greedy":
+                best_p,_=minimax(b,1,True) #Minimax com depth 1 é uma greedy search
+                bo.pause(1500,change_cursor=False)
+            elif levelP1 == "Minimax Depth = 3": #Minimax w/ Apha e Beta because it's faster 
+                #timer function - fazia print no terminal
+                best_p,_=minimaxAB(b,3,-100000,100000,True)
+                bo.pause(10,change_cursor=False)
+            elif levelP1 == "Minimax Depth = 5 (1,5 min to 3 min per move)":
+                # eg.msgbox('\n\n                       Please wait for the Engine move (1,5 to 3 min)',ok_button='Go back to the board') 
+                #timer function - fazia print no terminal
+                best_p,_=minimaxAB(b,5,-100000,100000,True)
+            elif levelP1 == 'Random Positioning':
+                best_p,_ = randomMove(b,jog)
+                bo.pause(1500,change_cursor=False)
+
+        else:
+            jog=2
+            if levelP2 == "Greedy":
+                best_p,_=minimax(b,1,False) #Minimax com depth 1 é uma greedy search
+                bo.pause(1500,change_cursor=False)
+            elif levelP2 == "Minimax Depth = 3": #Minimax w/ Apha e Beta because it's faster
+                #timer function - fazia print no terminal
+                best_p,_=minimaxAB(b,3,-100000,100000,False)
+                bo.pause(10,change_cursor=False)
+            elif levelP2 == "Minimax Depth = 5 (1,5 min to 3 min per move)":
+                # eg.msgbox('\n\n                       Please wait for the Engine move (1,5 to 3 min)',ok_button='Go back to the board') 
+                #timer function - fazia print no terminal
+                best_p,_=minimaxAB(b,5,-100000,100000,False)
+            elif levelP2 == 'Random Positioning':
+                best_p,_ = randomMove(b,jog)
+                bo.pause(1500,change_cursor=False)
+
+                
+        if not gameover(b):      
+            coord_init,coord_final=findMove(b,best_p)
+            move_piece_GUI(bo, coord_init,coord_final )
+            move_piece(b,coord_init,coord_final)
+            turn=turn+1     
+                   
+        if gameover(b) and jog==1:
+            winner=eg.msgbox('\n\n\n\n                           The calculations do not Fail. White won!')
+        elif gameover(b) and jog==2:
+            winner=eg.msgbox('\n\n\n\n                           The calculations do not Fail. Black won!')
+
+def hint(key):
+    global turn
+    
+    if key == 'Right':
+        
+        if turn % 2 == 0:
+            jog=1
+            p=True
+        else:
+            jog=2
+            p=False
+            
+        best_p,_=minimaxAB(b,3,-100000,100000,p)
+        coord_init,coord_final=findMove(b,best_p)
+        bo[coord_init[0]][coord_init[1]]=4
+        bo[coord_final[0]][coord_final[1]]=5
+        bo.pause(3000,change_cursor=True)
+        bo[coord_init[0]][coord_init[1]]=jog
+        bo[coord_final[0]][coord_final[1]]=0
+
+
+if __name__ == "__main__":
+    # Initialize a square board with a certain size and the 3 pieces for each player
+    size=5
+    b=np.zeros((size,size))
+    init(b)        
+
+    #Main Menu
+    welcome="hello"
+    rules=True
+    mode="let's see"
+    while not(rules==None or welcome==None or welcome == "PLAY!" or rules == False):
+        welcome=eg.buttonbox(msg="\n\n\n\n                               Welcome to Neutreko", title="Neutreeko", choices=("PLAY!","Game Rules") )
+        if welcome=="PLAY!":
+            start_game(size)
+            mode=eg.buttonbox(msg="\n\n\n                         Which mode would you like to play?\n                 To get a hint while playing press the right arrow", title="Let's Play!", choices=("Human VS Human","Human Vs Computer","Computer VS Computer"))
+        elif welcome== "Game Rules":
+            rules=eg.ccbox(msg="-Movement: A piece slides orthogonally or diagonally until stopped by \nan occupied square or the border of the board. Black always moves first.\n\n -Objective: To get three in a row, orthogonally or diagonally. The row must be connected.",
+                        title="Neutreeko Game Rules",choices=("Go back to Main Menu","Cancel"))
+        
+
+    if mode == "Human VS Human":
         click=1
-        for i in range(0,size):
-            for j in range(0,size):
-                if bo[i][j]==3:
-                    bo[i][j]=0
-
-
-#Human vs Human Check basic
-
-# if answer == 7:
-# start_game(size)
-# click=1
-# origin=[-1,-1]
-# selected = False
-# turn=0    
-
-
-
-
-# def pcpc(str):
-#     t=0
-#     best_p=b.copy()
-#     print(b)
-#     print('\n white first\n')
-#     if str == 'KP_1':
-#         print('deu!!')
+        origin=[-1,-1]
+        selected = False
+        turn=0    
+        bo.on_mouse_click = HumanVsHuman
+        bo.on_key_press = hint
         
-#     while gameover(best_p) == False:
-#         if t % 2==0:
-#             print('Player 1. to move: ')
-#             best_p, eval=minimax(best_p,3,True)
-#             arrayToGUI(best_p,bo)#se fizer isto assim tenho de definir o que é 0
-#             print(best_p)
-#             print(evaluate(best_p,1),' - ',evaluate(best_p,2),' = ',evaluate(best_p,1)-evaluate(best_p,2),'\n')
-
-#             t+=1
-#         elif t % 2 ==1:
+    elif mode=="Human Vs Computer":
+        click=1
+        origin=[-1,-1]
+        selected = False
+        turn=0 
+        level=eg.buttonbox(msg="\n                           Human goes First \n\n                           What is the A.I. Level?", title="Engine Level", choices=("Random Positioning","Greedy","Minimax Depth = 3","Minimax Depth = 5 (1,5 min to 3 min per move)"))
+        bo.on_mouse_click = HumanVsComputer
+        bo.on_key_press = hint
         
-#             best_p, eval=minimax(best_p,3,False)
-#             print('Player 2. to move: ')
-#             arrayToGUI(best_p,bo)
-#             print(best_p)
-#             print(evaluate(best_p,1),' - ',evaluate(best_p,2),' = ',evaluate(best_p,1)-evaluate(best_p,2),'\n')
+    elif mode == "Computer VS Computer":
+        turn=0
+        levelP1=eg.buttonbox(msg="\n\n\n                       What is the Player 1 A.I. Level?", title="Engine Level", choices=("Random Positioning","Greedy","Minimax Depth = 3","Minimax Depth = 5 (1,5 min to 3 min per move)"))
+        levelP2=eg.buttonbox(msg="\n\n\n                       What is the Player 2 A.I. Level?", title="Engine Level", choices=("Random Positioning","Greedy","Minimax Depth = 3","Minimax Depth = 5 (1,5 min to 3 min per move)"))
 
-#             t+=1
-
-
+        eg.msgbox("                         The automatic Game will start!\n            Please account for the time each Engine Level takes to play",ok_button='Start')
         
-# bo.on_key_press = pcpc        
-# bo.on_mouse_click = HumanVsHuman
+        bo.on_start = ComputerVsComputer
 
-# bo.show()
+    
+    bo.show()
