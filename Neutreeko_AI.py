@@ -577,6 +577,7 @@ def HumanVsHuman(btn,row,col):
                 init(b)
                 arrayToGUI(b,bo)
                 turn=0
+                bo.print('          Black (Player 1) Moves First')
             else:
                 bo.close()
     
@@ -675,6 +676,7 @@ def HumanVsComputer(btn,row,col):
                 init(b)
                 arrayToGUI(b,bo)
                 turn=0
+                bo.print('          Black (Player 1) Moves First')
             else:
                 bo.close()
 
@@ -695,9 +697,12 @@ def ComputerVsComputer():
             elif levelP1 == "Minimax Depth = 3": #Minimax w/ Apha e Beta because it's faster 
                 best_p,eval=minimaxAB(b,3,-100000,100000,True)
                 bo.pause(10,change_cursor=False)
-            elif levelP1 == "Minimax Depth = 5 (1,5 min to 3 min per move)":
-                bo.print('Please wait for the Engine move (1,5 to 3 min)') 
+            elif levelP1 == "Minimax Depth = 5":
+                bo.print('Please wait for the Engine move (1,5 to 3 min)')
+                bo.pause(10,change_cursor=False)
                 best_p,eval=minimaxAB(b,5,-100000,100000,True)
+                bo.pause(10,change_cursor=False)
+                print('first taa')
             elif levelP1 == 'Random Positioning':
                 best_p,eval = randomMove(b,jog)
                 bo.pause(1500,change_cursor=False)
@@ -714,8 +719,10 @@ def ComputerVsComputer():
                 best_p,eval=minimaxAB(b,3,-100000,100000,False)
                 bo.pause(10,change_cursor=False)
             elif levelP2 == "Minimax Depth = 5":
-                bo.print('Please wait for the Engine move (1,5 to 3 min)') 
+                bo.print('Please wait for the Engine move (1,5 to 3 min)')
+                bo.pause(10,change_cursor=False)
                 best_p,eval=minimaxAB(b,5,-100000,100000,False)
+                bo.pause(10,change_cursor=False)
             elif levelP2 == 'Random Positioning':
                 best_p,eval = randomMove(b,jog)
                 bo.pause(1500,change_cursor=False)
@@ -800,8 +807,8 @@ if __name__ == "__main__":
     elif mode == "Computer VS Computer":
         
         turn=0
-        levelP1=eg.buttonbox(msg="\n\n\n                       What is the Player 1 A.I. Level?", title="Engine Level", choices=("Random Positioning","Greedy","Minimax Depth = 3","Minimax Depth = 5 (1,5 min to 3 min per move)"))
-        levelP2=eg.buttonbox(msg="\n\n\n                       What is the Player 2 A.I. Level?", title="Engine Level", choices=("Random Positioning","Greedy","Minimax Depth = 3","Minimax Depth = 5 (1,5 min to 3 min per move)"))
+        levelP1=eg.buttonbox(msg="\n\n\n                       What is the Player 1 A.I. Level?", title="Engine Level", choices=("Random Positioning","Greedy","Minimax Depth = 3","Minimax Depth = 5"))
+        levelP2=eg.buttonbox(msg="\n\n\n                       What is the Player 2 A.I. Level?", title="Engine Level", choices=("Random Positioning","Greedy","Minimax Depth = 3","Minimax Depth = 5"))
         if not (levelP1 == None or levelP2 == None):
             eg.msgbox("                         The automatic Game will start!\n            Please account for the time each Engine Level takes to play",ok_button='Start')
             
