@@ -500,10 +500,10 @@ def start_game(size):
     arrayToGUI(b,bo)
     bo.title = "Neutreeko"
     bo.cell_size = 72      
-    bo.cell_color = "LightGreen"
-    bo.margin = 20
-    bo._margin_color = "MediumSeaGreen"
-    bo.create_output(background_color="MediumSeaGreen", color="black", font_size=12)
+    bo.cell_color = "LightSeaGreen"
+    bo.margin = 15
+    bo._margin_color = "#001f35"
+    bo.create_output(background_color="#001f35", color="#ffff70", font_size=12)
     bo.print('          Black (Player 1) Moves First')
     
 def move_piece_GUI(board, init_coord, final_coord ):
