@@ -590,7 +590,7 @@ def HumanVsHuman(btn,row,col):
             
     
         if gameover(b) and jog==1:
-            print(turn)
+             
             if eg.ccbox(msg='\n\n\n\n                           Congratulations, Black wins!',title="Congratulations",choices=("Play again?","Quit!")):     # show a Continue/Cancel dialog
                 b=np.zeros((size,size))
                 init(b)
@@ -601,7 +601,7 @@ def HumanVsHuman(btn,row,col):
                 bo.close()
             
         elif gameover(b) and jog==2:
-            print(turn)
+             
             if eg.ccbox(msg='\n\n\n\n                           Congratulations, White wins!',title="Congratulations",choices=("Play again?","Quit!")):     # show a Continue/Cancel dialog
                 b=np.zeros((size,size))
                 init(b)
@@ -704,7 +704,7 @@ def HumanVsComputer(btn,row,col):
                         turn=turn+1                  
     
         if gameover(b) and jog==1:
-            print(turn)
+             
             if eg.ccbox(msg='\n\n\n\n                           Congratulations, Black wins!',title="Congratulations",choices=("Play again?","Quit!")):     # show a Continue/Cancel dialog
                 b=np.zeros((size,size))
                 init(b)
@@ -714,7 +714,7 @@ def HumanVsComputer(btn,row,col):
             else:
                 bo.close()   
         elif gameover(b) and jog==2:
-            print(turn)
+             
             if eg.ccbox(msg='\n\n\n\n                           You will beat it next time!',title="Retry?",choices=("Play again?","Quit!")):     # show a Continue/Cancel dialog
                 b=np.zeros((size,size))
                 init(b)
@@ -780,10 +780,10 @@ def ComputerVsComputer():
             turn=turn+1     
                    
         if gameover(b) and jog==1:
-            print(turn)
+             
             winner=eg.msgbox('\n\n\n\n                      The calculations do not Fail. Black won!')
         elif gameover(b) and jog==2:
-            print(turn)
+             
             winner=eg.msgbox('\n\n\n\n                      The calculations do not Fail. White won!')
 
 def hint(key):
