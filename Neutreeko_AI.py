@@ -10,11 +10,19 @@ import time
 
 def init(board):
     board[0,1]=1
-    board[0,size-2]=1
+    board[0,3]=1
     board[size-2,2]=1
     board[1,2]=2
     board[size-1,1]=2
-    board[size-1,size-2]=2
+    board[size-1,3]=2
+    
+    
+    # board[0,0]=1
+    # board[4,2]=1
+    # board[3,4]=1
+    # board[3,0]=2
+    # board[4,0]=2
+    # board[0,4]=2
     # print(board)
 
 def locationOfPieces(board):
@@ -531,15 +539,28 @@ def HumanVsHuman(btn,row,col):
  
         for pos in play:
             if click == 1 and np.array_equal(pos,[row,col]) and selected == False:
+                
+                if jog == 1:
+                    bo[row][col]=11
+                elif jog ==2:
+                    bo[row][col]=22
+                
                 for dir in range(1,9):
                     legal_coord = legal(b,[row,col],dir) #resolver a questão do size
                     if not np.array_equal(legal_coord,[row,col]):
-                        bo[legal_coord[0]][legal_coord[1]]=3       
+                        bo[legal_coord[0]][legal_coord[1]]=3 
+                      
                 click=2
                 selected = True
                 origin=[row,col]
                 break
             elif click == 2 and np.array_equal(origin,[row,col]) and selected == True :
+                
+                if jog == 1:
+                    bo[row][col]=1
+                elif jog ==2:
+                    bo[row][col]=2
+                
                 for dir in range(1,9):
                     legal_coord = legal(b,[row,col],dir) #resolver a questão do size
                     if not np.array_equal(legal_coord,[row,col]):
@@ -550,6 +571,12 @@ def HumanVsHuman(btn,row,col):
                 break
         
         if selected == True and bo[row][col]==3:
+            
+            if jog == 1:
+                bo[origin[0]][origin[1]]=1
+            elif jog ==2:
+                bo[origin[0]][origin[1]]=2
+            
             move_piece_GUI(bo, origin, [row,col])
             move_piece(b,origin,[row,col])
             turn +=1
@@ -563,15 +590,18 @@ def HumanVsHuman(btn,row,col):
             
     
         if gameover(b) and jog==1:
+            print(turn)
             if eg.ccbox(msg='\n\n\n\n                           Congratulations, Black wins!',title="Congratulations",choices=("Play again?","Quit!")):     # show a Continue/Cancel dialog
                 b=np.zeros((size,size))
                 init(b)
                 arrayToGUI(b,bo)
                 turn=0
+                bo.print('          Black (Player 1) Moves First')
             else:
                 bo.close()
             
         elif gameover(b) and jog==2:
+            print(turn)
             if eg.ccbox(msg='\n\n\n\n                           Congratulations, White wins!',title="Congratulations",choices=("Play again?","Quit!")):     # show a Continue/Cancel dialog
                 b=np.zeros((size,size))
                 init(b)
@@ -604,6 +634,10 @@ def HumanVsComputer(btn,row,col):
  
             for pos in play:
                 if click == 1 and np.array_equal(pos,[row,col]) and selected == False:
+                    
+                    if jog == 1:
+                        bo[row][col]=11
+                    
                     for dir in range(1,9):
                         legal_coord = legal(b,[row,col],dir) #resolver a questão do size
                         if not np.array_equal(legal_coord,[row,col]):
@@ -613,6 +647,9 @@ def HumanVsComputer(btn,row,col):
                     origin=[row,col]
                     break
                 elif click == 2 and np.array_equal(origin,[row,col]) and selected == True :
+                    if jog == 1:
+                        bo[row][col]=1
+
                     for dir in range(1,9):
                         legal_coord = legal(b,[row,col],dir) #resolver a questão do size
                         if not np.array_equal(legal_coord,[row,col]):
@@ -623,6 +660,10 @@ def HumanVsComputer(btn,row,col):
                     break
         
             if selected == True and bo[row][col]==3:
+                
+                if jog == 1:
+                    bo[origin[0]][origin[1]]=1
+                
                 move_piece_GUI(bo, origin, [row,col])
                 move_piece(b,origin,[row,col])
                 turn=turn+1
@@ -647,10 +688,10 @@ def HumanVsComputer(btn,row,col):
                             #timer function - fazia print no terminal
                             bo.pause(10,change_cursor=False)
                             best_p,eval=minimaxAB(b,3,-100000,100000,False)
-                        elif level == "Minimax Depth = 5":
-                            bo.print('Please wait for the Engine move (1,5 to 3 min)') 
+                        elif level == "Minimax Depth = 4":
+                            bo.print('Please wait for the Engine move (30 sec to 1 min)') 
                             #timer function - fazia print no terminal
-                            best_p,eval=minimaxAB(b,5,-100000,100000,False)
+                            best_p,eval=minimaxAB(b,4,-100000,100000,False)
                         elif level == 'Random Positioning':
                             best_p,eval = randomMove(b,jog)
                         
@@ -663,14 +704,17 @@ def HumanVsComputer(btn,row,col):
                         turn=turn+1                  
     
         if gameover(b) and jog==1:
+            print(turn)
             if eg.ccbox(msg='\n\n\n\n                           Congratulations, Black wins!',title="Congratulations",choices=("Play again?","Quit!")):     # show a Continue/Cancel dialog
                 b=np.zeros((size,size))
                 init(b)
                 arrayToGUI(b,bo)
                 turn=0
+                bo.print('          Black (Player 1) Moves First')
             else:
                 bo.close()   
         elif gameover(b) and jog==2:
+            print(turn)
             if eg.ccbox(msg='\n\n\n\n                           You will beat it next time!',title="Retry?",choices=("Play again?","Quit!")):     # show a Continue/Cancel dialog
                 b=np.zeros((size,size))
                 init(b)
@@ -697,12 +741,11 @@ def ComputerVsComputer():
             elif levelP1 == "Minimax Depth = 3": #Minimax w/ Apha e Beta because it's faster 
                 best_p,eval=minimaxAB(b,3,-100000,100000,True)
                 bo.pause(10,change_cursor=False)
-            elif levelP1 == "Minimax Depth = 5":
-                bo.print('Please wait for the Engine move (1,5 to 3 min)')
+            elif levelP1 == "Minimax Depth = 4":
+                bo.print('Please wait for the Engine move (30 sec to 1 min)')
                 bo.pause(10,change_cursor=False)
-                best_p,eval=minimaxAB(b,5,-100000,100000,True)
+                best_p,eval=minimaxAB(b,4,-100000,100000,True)
                 bo.pause(10,change_cursor=False)
-                print('first taa')
             elif levelP1 == 'Random Positioning':
                 best_p,eval = randomMove(b,jog)
                 bo.pause(1500,change_cursor=False)
@@ -718,10 +761,10 @@ def ComputerVsComputer():
             elif levelP2 == "Minimax Depth = 3": #Minimax w/ Apha e Beta because it's faster
                 best_p,eval=minimaxAB(b,3,-100000,100000,False)
                 bo.pause(10,change_cursor=False)
-            elif levelP2 == "Minimax Depth = 5":
-                bo.print('Please wait for the Engine move (1,5 to 3 min)')
+            elif levelP2 == "Minimax Depth = 4":
+                bo.print('Please wait for the Engine move (30 sec to 1 min)')
                 bo.pause(10,change_cursor=False)
-                best_p,eval=minimaxAB(b,5,-100000,100000,False)
+                best_p,eval=minimaxAB(b,4,-100000,100000,False)
                 bo.pause(10,change_cursor=False)
             elif levelP2 == 'Random Positioning':
                 best_p,eval = randomMove(b,jog)
@@ -737,8 +780,10 @@ def ComputerVsComputer():
             turn=turn+1     
                    
         if gameover(b) and jog==1:
+            print(turn)
             winner=eg.msgbox('\n\n\n\n                      The calculations do not Fail. Black won!')
         elif gameover(b) and jog==2:
+            print(turn)
             winner=eg.msgbox('\n\n\n\n                      The calculations do not Fail. White won!')
 
 def hint(key):
@@ -797,7 +842,7 @@ if __name__ == "__main__":
         origin=[-1,-1]
         selected = False
         turn=0 
-        level=eg.buttonbox(msg="\n                           Human goes First \n\n                           What is the A.I. Level?", title="Engine Level", choices=("Random Positioning","Greedy","Minimax Depth = 3","Minimax Depth = 5"))
+        level=eg.buttonbox(msg="\n                           Human goes First \n\n                           What is the A.I. Level?", title="Engine Level", choices=("Random Positioning","Greedy","Minimax Depth = 3","Minimax Depth = 4"))
         if level != None:
             start_game(size)
             bo.on_mouse_click = HumanVsComputer
@@ -807,8 +852,8 @@ if __name__ == "__main__":
     elif mode == "Computer VS Computer":
         
         turn=0
-        levelP1=eg.buttonbox(msg="\n\n\n                       What is the Player 1 A.I. Level?", title="Engine Level", choices=("Random Positioning","Greedy","Minimax Depth = 3","Minimax Depth = 5"))
-        levelP2=eg.buttonbox(msg="\n\n\n                       What is the Player 2 A.I. Level?", title="Engine Level", choices=("Random Positioning","Greedy","Minimax Depth = 3","Minimax Depth = 5"))
+        levelP1=eg.buttonbox(msg="\n\n\n                       What is the Player 1 A.I. Level?", title="Engine Level", choices=("Random Positioning","Greedy","Minimax Depth = 3","Minimax Depth = 4"))
+        levelP2=eg.buttonbox(msg="\n\n\n                       What is the Player 2 A.I. Level?", title="Engine Level", choices=("Random Positioning","Greedy","Minimax Depth = 3","Minimax Depth = 4"))
         if not (levelP1 == None or levelP2 == None):
             eg.msgbox("                         The automatic Game will start!\n            Please account for the time each Engine Level takes to play",ok_button='Start')
             
