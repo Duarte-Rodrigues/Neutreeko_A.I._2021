@@ -15,15 +15,7 @@ def init(board):
     board[1,2]=2
     board[size-1,1]=2
     board[size-1,3]=2
-    
-    
-    # board[0,0]=1
-    # board[4,2]=1
-    # board[3,4]=1
-    # board[3,0]=2
-    # board[4,0]=2
-    # board[0,4]=2
-    # print(board)
+
 
 def locationOfPieces(board):
     #Sets an array with the position of the board pieces [1 1 1 2 2 2]
