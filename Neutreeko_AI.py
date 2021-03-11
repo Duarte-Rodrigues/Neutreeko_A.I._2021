@@ -882,7 +882,8 @@ def rightHint_leftHistory(key):
         bo[coord_final[0]][coord_final[1]]=0
         
     if key == 'Left':
-        print('\n####################################  History of Moves  ####################################')
+        print('\n####################################  History of Moves  ####################################\n')
+        print(turn,' rounds played.\n')
         print(history)
         print('##########################################  End  ##########################################\n')
 
