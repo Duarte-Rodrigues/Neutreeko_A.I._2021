@@ -1,18 +1,16 @@
 # Neutreeko - This project was developed by Duarte Rodrigues and Jacinta Ferreira for IA_MECD course.
 
 import numpy as np
-import copy 
 from game2dboard import Board
 import easygui as eg
+import copy 
 import random
 import time
 import math
 
 
 def init(board):
-    
-    odd_middle=math.floor(size/2)
-    
+
     if size%2==0: #Invented position for even square board
         board[0,0]=1
         board[0,2]=1
@@ -23,6 +21,8 @@ def init(board):
         board[size-2,size-2]=1
         
     elif size%2==1:
+        odd_middle=math.floor(size/2)
+        
         board[0,odd_middle-1]=1
         board[0,odd_middle+1]=1
         board[1,odd_middle]=2
@@ -127,6 +127,16 @@ def move_piece(board, init_coord, final_coord ):
     if not np.array_equal(final_coord,init_coord):
         board[final_coord[0],final_coord[1]] = board[init_coord[0],init_coord[1]]
         board[init_coord[0],init_coord[1]]=0
+
+def clearHistory():
+    global history
+    
+    erase=[]
+    for ind in range(1, history.shape[0]):
+        erase.append(ind)
+    
+    history=np.delete(history,erase,0)
+    # return hist
 
 #Heuristics
 
@@ -536,6 +546,7 @@ def HumanVsHuman(btn,row,col):
     global turn
     global winner
     global b
+    global history
     
     if not gameover(b):
         
@@ -599,6 +610,8 @@ def HumanVsHuman(btn,row,col):
             
             move_piece_GUI(bo, origin, [row,col])
             move_piece(b,origin,[row,col])
+            nextBoard = np.array([b])
+            history=np.concatenate( (history,nextBoard) )
             turn +=1
             bo.print('Player',(turn % 2)+1,'to move! ','Heuristic Evaluation - Player 1:',evaluate(b,1),'\nPlayer 2:',-evaluate(b,2),' Total Evaluation: ',evaluate(b,1)-evaluate(b,2) )
             selected = False
@@ -615,6 +628,7 @@ def HumanVsHuman(btn,row,col):
                 b=np.zeros((size,size))
                 init(b)
                 arrayToGUI(b,bo)
+                clearHistory()
                 turn=0
                 bo.print('          Black (Player 1) Moves First')
             else:
@@ -626,6 +640,7 @@ def HumanVsHuman(btn,row,col):
                 b=np.zeros((size,size))
                 init(b)
                 arrayToGUI(b,bo)
+                clearHistory()
                 turn=0
                 bo.print('          Black (Player 1) Moves First')
             else:
@@ -639,6 +654,7 @@ def HumanVsComputer(btn,row,col):
     global winner
     global level
     global b
+    global history
     
     if not gameover(b):
         
@@ -687,6 +703,8 @@ def HumanVsComputer(btn,row,col):
                 
                 move_piece_GUI(bo, origin, [row,col])
                 move_piece(b,origin,[row,col])
+                nextBoard = np.array([b])
+                history=np.concatenate( (history,nextBoard) )
                 turn=turn+1
                 bo.print('A.I. Engine to move!','Heuristic Evaluation - Player 1:',evaluate(b,1),'\nPlayer 2:',-evaluate(b,2),' Total Evaluation: ',evaluate(b,1)-evaluate(b,2) )
                 selected = False
@@ -725,6 +743,8 @@ def HumanVsComputer(btn,row,col):
                         coord_init,coord_final=findMove(b,best_p)
                         move_piece_GUI(bo, coord_init,coord_final )
                         move_piece(b,coord_init,coord_final)
+                        nextBoard = np.array([b])
+                        history=np.concatenate( (history,nextBoard) )
                         bo.print('Player1 to move!  Predicted «',level,'» evaluation:',eval, '\nCurrent Board Eval:',evaluate(b,1)-evaluate(b,2) )
 
                         turn=turn+1                  
@@ -736,6 +756,7 @@ def HumanVsComputer(btn,row,col):
                 b=np.zeros((size,size))
                 init(b)
                 arrayToGUI(b,bo)
+                clearHistory()
                 turn=0
                 bo.print('          Black (Player 1) Moves First')
             else:
@@ -746,6 +767,7 @@ def HumanVsComputer(btn,row,col):
                 b=np.zeros((size,size))
                 init(b)
                 arrayToGUI(b,bo)
+                clearHistory()
                 turn=0
                 bo.print('          Black (Player 1) Moves First')
             else:
@@ -756,6 +778,7 @@ def ComputerVsComputer():
     global winner
     global levelP1
     global levelP2
+    global history
     
     
     while not gameover(b):
@@ -775,7 +798,8 @@ def ComputerVsComputer():
             
             #Level 3    
             elif levelP1 == "Minimax Depth = 4":
-                bo.print('Please wait for the Engine move (30 sec to 1 min)')
+                if turn==0:
+                    bo.print('Please wait for the Engine move (30 sec to 1 min)')
                 bo.pause(10,change_cursor=False)
                 best_p,eval=minimaxAB(b,4,-100000,100000,True)
                 bo.pause(10,change_cursor=False)
@@ -798,7 +822,8 @@ def ComputerVsComputer():
                 bo.pause(10,change_cursor=False)
                 
             elif levelP2 == "Minimax Depth = 4":
-                bo.print('Please wait for the Engine move (30 sec to 1 min)')
+                if turn==1:
+                    bo.print('Please wait for the Engine move (30 sec to 1 min)')
                 bo.pause(10,change_cursor=False)
                 best_p,eval=minimaxAB(b,4,-100000,100000,False)
                 bo.pause(10,change_cursor=False)
@@ -813,11 +838,13 @@ def ComputerVsComputer():
             coord_init,coord_final=findMove(b,best_p)
             move_piece_GUI(bo, coord_init,coord_final )
             move_piece(b,coord_init,coord_final)
+            nextBoard = np.array([b])
+            history=np.concatenate( (history,nextBoard) )
             
             if jog ==1:
-                bo.print('Player2 to move!\nPredicted P1«',levelP1,'» evaluation:',eval,'\nCurrent Board Eval:',evaluate(b,1)-evaluate(b,2) )
+                bo.print('Player2 to move! Predicted P1«',levelP1,'» evaluation:',eval,'\nCurrent Board Eval:',evaluate(b,1)-evaluate(b,2) )
             elif jog==2:
-                bo.print('Player1 to move!\nPredicted P2«',levelP2,'» evaluation:',eval,'\nCurrent Board Eval:',evaluate(b,1)-evaluate(b,2) )
+                bo.print('Player1 to move! Predicted P2«',levelP2,'» evaluation:',eval,'\nCurrent Board Eval:',evaluate(b,1)-evaluate(b,2) )
 
             turn=turn+1     
             
@@ -829,7 +856,7 @@ def ComputerVsComputer():
              
             winner=eg.msgbox('\n\n\n\n                    The calculations do not Fail. White won!\n                     Dont forget to close the board window!')
 
-def hint(key):
+def rightHint_leftHistory(key):
     global turn
     
     #The right arrow key in the keyboardshows a suggested move for 3 secons
@@ -853,7 +880,13 @@ def hint(key):
         #Back to normal game
         bo[coord_init[0]][coord_init[1]]=jog
         bo[coord_final[0]][coord_final[1]]=0
+        
+    if key == 'Left':
+        print('\n####################################  History of Moves  ####################################')
+        print(history)
+        print('##########################################  End  ##########################################\n')
 
+    
 
 if __name__ == "__main__":
     # Initialize a square board with a certain size and the 3 pieces for each player
@@ -870,11 +903,13 @@ if __name__ == "__main__":
                 break
             b=np.zeros((size,size))
             init(b)  
-            mode=eg.buttonbox(msg="\n\n\n                         Which mode would you like to play?\n                 To get a hint while playing press the right arrow", title="Let's Play!", choices=("Human VS Human","Human Vs Computer","Computer VS Computer"))
+            history = np.array([b])
+            mode=eg.buttonbox(msg="\n\n\n                         Which mode would you like to play?\n                 To get a hint while playing press the right arrow.\n To see the history of moves press the left arrow, it appears in the terminal.", title="Let's Play!", choices=("Human VS Human","Human Vs Computer","Computer VS Computer"))
         elif welcome== "Game Rules":
-            rules=eg.ccbox(msg="-Movement: A piece slides orthogonally or diagonally until stopped by \nan occupied square or the border of the board. Black always moves first.\n\n -Objective: To get three in a row, orthogonally or diagonally. The row must be connected.\n\nIf you need a Hint, click on the RIGHT ARROW on your keyboard (be aware it takes 2 secons to appear). The blue ball represents the piece you should move, and red ball is the suggested square to move.",
+            rules=eg.ccbox(msg="-Movement: A piece slides orthogonally or diagonally until stopped by \nan occupied square or the border of the board. Black always moves first.\n\n -Objective: To get three in a row, orthogonally or diagonally. The row must be connected.\n\nIf you need a Hint, click on the RIGHT ARROW on your keyboard (be aware it takes 2 secons to appear). The blue ball represents the piece you should move, and red ball is the suggested square to move.\n\nIf you want to see the history of the moves, click the LEFT ARROW KEY, and it will appear the move sequence played in the game.",
                         title="Neutreeko Game Rules",choices=("Go back to Main Menu","Cancel"))
         
+
     #Declaration of the different mouse events depending on the game modes
     if mode == "Human VS Human":
         start_game(size)
@@ -883,7 +918,8 @@ if __name__ == "__main__":
         selected = False
         turn=0    
         bo.on_mouse_click = HumanVsHuman
-        bo.on_key_press = hint
+        bo.on_key_press = rightHint_leftHistory
+        
         bo.show()
         
     elif mode=="Human Vs Computer":
@@ -896,7 +932,7 @@ if __name__ == "__main__":
         if level != None:
             start_game(size)
             bo.on_mouse_click = HumanVsComputer
-            bo.on_key_press = hint
+            bo.on_key_press = rightHint_leftHistory            
             bo.show()
         
     elif mode == "Computer VS Computer":
@@ -909,6 +945,7 @@ if __name__ == "__main__":
             
             start_game(size)
             bo.on_start = ComputerVsComputer
+            bo.on_key_press = rightHint_leftHistory
             bo.show()
 
     
