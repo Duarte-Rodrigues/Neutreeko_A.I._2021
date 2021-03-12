@@ -136,7 +136,7 @@ def clearHistory():
         erase.append(ind)
     
     history=np.delete(history,erase,0)
-    # return hist
+
 
 #Heuristics
 
@@ -910,7 +910,7 @@ if __name__ == "__main__":
             rules=eg.ccbox(msg="-Movement: A piece slides orthogonally or diagonally until stopped by \nan occupied square or the border of the board. Black always moves first.\n\n -Objective: To get three in a row, orthogonally or diagonally. The row must be connected.\n\nIf you need a Hint, click on the RIGHT ARROW on your keyboard (be aware it takes 2 secons to appear). The blue ball represents the piece you should move, and red ball is the suggested square to move.\n\nIf you want to see the history of the moves, click the LEFT ARROW KEY, and it will appear the move sequence played in the game.",
                         title="Neutreeko Game Rules",choices=("Go back to Main Menu","Cancel"))
         
-
+        
     #Declaration of the different mouse events depending on the game modes
     if mode == "Human VS Human":
         start_game(size)
